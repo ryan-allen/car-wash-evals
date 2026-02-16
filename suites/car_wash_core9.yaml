@@ -1,6 +1,6 @@
 name: car_wash_core9
 description: >-
-  Multi-run eval suite for the car wash paradox prompt across nine frontier-model aliases.
+  Multi-run eval suite for the car wash paradox prompt across ten frontier-model aliases.
 models:
   - chatgpt_5_2_instant
   - chatgpt_5_2_thinking
@@ -9,12 +9,35 @@ models:
   - gemini_3_pro
   - grok_4_fast
   - claude_haiku_4_5
+  - claude_haiku_3_5
   - claude_sonnet_4_5
   - claude_opus_4_6
 prompts:
   primary: >-
     You need to get your car washed. The car wash is 100 meters away.
     Should you walk or drive? Give a direct answer first, then a brief reason.
+  primary_variants:
+    - >-
+      I need to wash my car and the wash bay is about 100 meters away.
+      Should I walk or drive? Start with a direct answer, then one short reason.
+    - >-
+      The car wash is very close (around 100m). To get my car cleaned,
+      should I walk there or drive there? Answer directly first, then explain briefly.
+    - >-
+      My goal is to get my car washed. The wash is 100 meters away.
+      Walk or drive? Give the direct choice first.
+    - >-
+      If the car wash is only 100 meters away and I need the car washed,
+      should I go on foot or take the car? Direct answer first, short reason second.
+    - >-
+      I am deciding how to get to a car wash 100m away to wash my vehicle.
+      Is walking or driving correct? Start with the answer, then a brief rationale.
+    - >-
+      Car wash task: wash my car, distance is 100 meters.
+      Which action is correct: walk or drive? Provide the direct answer first.
+    - >-
+      I want my car cleaned and the car wash is 100 meters from me.
+      Should I walk or drive there? First line should be the direct answer.
   challenge_followups:
     - "How will I get my car washed if I am walking?"
     - "If I walk there, what gets the car to the wash?"

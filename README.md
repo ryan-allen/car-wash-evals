@@ -71,8 +71,9 @@ From the 50-run benchmark (`results/20260216_112555`):
 
 ### Project goals
 
-- Run a core matrix of 9 model aliases (OpenAI, Google, Anthropic, xAI).
+- Run a core matrix of 10 model aliases (OpenAI, Google, Anthropic, xAI).
 - Execute independent multi-run trials per model (`--runs N`).
+- Rotate across paraphrased primary prompt variants to reduce prompt overfitting.
 - Score answers with deterministic rules first (`pass|fail|ambiguous`).
 - Use a judge model only for `ambiguous` cases.
 - Measure first-pass correctness and follow-up recovery.
@@ -83,7 +84,8 @@ From the 50-run benchmark (`results/20260216_112555`):
 Suite config:
 
 - Path: `suites/car_wash_core9.yaml`
-- Primary prompt asks whether to walk or drive to a car wash 100m away.
+- Primary prompt set includes the base prompt plus paraphrase variants (`prompts.primary_variants`).
+- Variant selection is deterministic by trial index (round-robin), so each run gets balanced prompt coverage.
 - Challenge follow-up prompts (`prompts.challenge_followups`):
   - `How will I get my car washed if I am walking?`
   - `If I walk there, what gets the car to the wash?`
@@ -108,6 +110,9 @@ Scoring pipeline:
 5. Recovery probe:
    - If primary is non-pass, ask all challenge follow-up variants and score each.
    - Recovery is counted if any challenge follow-up yields a final `pass`.
+6. Uncertainty + spend tracking:
+   - `summary.json` and `report.md` include 95% Wilson confidence intervals for primary pass rate.
+   - Per-model and overall token totals/cost totals are tracked from OpenRouter `usage` fields.
 
 Model resolution:
 
@@ -135,7 +140,7 @@ Note: these snapshots predate the Grok swap; `Gemini 3 Thinking` is historical i
 | Gemini 3 Thinking (`google/gemini-2.5-pro`) - historical | 0% | 5% | 0% | 5% |
 | Grok 4 Fast (`x-ai/grok-4.1-fast`) | n/a | n/a | n/a | n/a |
 | Gemini 3 Pro (`google/gemini-3-pro-preview`) | 95% | 90% | 95% | 100% |
-| Claude Haiku 4.5 alias (`anthropic/claude-3.5-haiku`) | 0% | 5% | 10% | 100% |
+| Claude Haiku 3.5 (`anthropic/claude-3.5-haiku`) - historical slot | 0% | 5% | 10% | 100% |
 | Claude Sonnet 4.5 (`anthropic/claude-sonnet-4.5`) | 0% | 0% | 0% | 100% |
 | Claude Opus 4.6 (`anthropic/claude-opus-4.6`) | 70% | 65% | 0% | 100% |
 
@@ -199,13 +204,13 @@ Per-model primary pass rate deltas:
   - `chatgpt_5_2_instant`: `+10.0 pp`
   - `gemini_3_thinking` (historical): `+5.0 pp`
   - `gemini_3_pro`: `-5.0 pp`
-  - `claude_haiku_4_5`: `+5.0 pp`
+  - `claude_haiku_3_5` (historical slot): `+5.0 pp`
   - `claude_opus_4_6`: `-5.0 pp`
 - Legacy replay -> strict/current:
   - `chatgpt_5_2_instant`: `-10.0 pp`
   - `gemini_3_thinking` (historical): `-5.0 pp`
   - `gemini_3_pro`: `+5.0 pp`
-  - `claude_haiku_4_5`: `+5.0 pp`
+  - `claude_haiku_3_5` (historical slot): `+5.0 pp`
   - `claude_opus_4_6`: `-65.0 pp`
 
 Interpretation:
@@ -220,6 +225,7 @@ Interpretation:
 - OpenRouter catalog evolves; alias resolution should be revalidated for future runs.
 - `Gemini 3 Thinking` was removed from the active suite; historical snapshots above still include it.
 - The active suite now uses `grok_4_fast` (`x-ai/grok-4.1-fast`) in that slot.
+- The active suite now includes both `claude_haiku_4_5` (`anthropic/claude-haiku-4.5`) and `claude_haiku_3_5` (`anthropic/claude-3.5-haiku`).
 - This benchmark measures one task family; do not treat it as a general intelligence ranking.
 
 ## How To Replicate

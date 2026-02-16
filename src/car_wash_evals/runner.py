@@ -136,10 +136,13 @@ def load_suite_config(path: Path) -> SuiteConfig:
     prompts_data = data.get("prompts")
     if not isinstance(prompts_data, dict):
         raise ConfigError("Suite config requires prompts mapping")
+    primary = _required_str(prompts_data, "primary")
+    primary_variants = _parse_primary_variants(prompts_data, primary)
     challenge_followups = _parse_challenge_followups(prompts_data)
     prompts = PromptConfig(
-        primary=_required_str(prompts_data, "primary"),
+        primary=primary,
         challenge_followups=challenge_followups,
+        primary_variants=primary_variants,
     )
 
     exec_data = data.get("execution")
@@ -286,10 +289,14 @@ def _run_single_trial(
     start_time = time.perf_counter()
     usage_total: dict[str, Any] | None = None
     reason_codes: list[str] = []
+    primary_prompt_index, primary_prompt = _select_primary_prompt(
+        prompts=suite.prompts,
+        trial_index=job.trial_index,
+    )
 
     primary_chat = client.chat_completion(
         model=job.resolved_model_id,
-        messages=[{"role": "user", "content": suite.prompts.primary}],
+        messages=[{"role": "user", "content": primary_prompt}],
         temperature=suite.execution.temperature,
         max_tokens=suite.execution.max_tokens,
     )
@@ -312,7 +319,7 @@ def _run_single_trial(
         client=client,
         decision=primary_decision,
         judge_model=judge_model,
-        question=suite.prompts.primary,
+        question=primary_prompt,
         response=primary_chat.text,
         usage_total=usage_total,
         reason_codes=reason_codes,
@@ -331,7 +338,7 @@ def _run_single_trial(
             challenge_chat = client.chat_completion(
                 model=job.resolved_model_id,
                 messages=[
-                    {"role": "user", "content": suite.prompts.primary},
+                    {"role": "user", "content": primary_prompt},
                     {"role": "assistant", "content": primary_chat.text},
                     {"role": "user", "content": followup},
                 ],
@@ -358,6 +365,7 @@ def _run_single_trial(
             challenge_attempts.append(
                 {
                     "index": idx,
+                    "question": followup,
                     "prompt": followup,
                     "response": challenge_chat.text,
                     "label": challenge_decision.label,
@@ -391,6 +399,8 @@ def _run_single_trial(
         timestamp=datetime.now(UTC).isoformat(),
         primary_mode_labels=primary_mode_labels,
         challenge_attempts=challenge_attempts,
+        primary_prompt=primary_prompt,
+        primary_prompt_index=primary_prompt_index,
     )
 
 @dataclass(frozen=True)
@@ -491,6 +501,32 @@ def _parse_challenge_followups(prompts_data: dict[str, Any]) -> list[str]:
 
     # Backward-compatible fallback.
     return [_required_str(prompts_data, "challenge_followup")]
+
+
+def _parse_primary_variants(prompts_data: dict[str, Any], primary: str) -> list[str]:
+    raw_variants = prompts_data.get("primary_variants")
+    if raw_variants is None:
+        return [primary]
+    if not isinstance(raw_variants, list) or not raw_variants:
+        raise ConfigError("prompts.primary_variants must be a non-empty list of strings")
+
+    variants: list[str] = [primary]
+    seen = {primary}
+    for item in raw_variants:
+        if not isinstance(item, str) or not item.strip():
+            raise ConfigError("prompts.primary_variants must contain non-empty strings")
+        normalized = item.strip()
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        variants.append(normalized)
+    return variants
+
+
+def _select_primary_prompt(prompts: PromptConfig, trial_index: int) -> tuple[int, str]:
+    variants = prompts.all_primary_variants
+    index = (trial_index - 1) % len(variants)
+    return index + 1, variants[index]
 
 
 def _validate_inputs(args: argparse.Namespace) -> None:

@@ -19,10 +19,17 @@ class ModelAlias:
 class PromptConfig:
     primary: str
     challenge_followups: list[str]
+    primary_variants: list[str] = field(default_factory=list)
 
     @property
     def challenge_followup(self) -> str:
         return self.challenge_followups[0]
+
+    @property
+    def all_primary_variants(self) -> list[str]:
+        if self.primary_variants:
+            return self.primary_variants
+        return [self.primary]
 
 
 @dataclass(frozen=True)
@@ -67,6 +74,8 @@ class TrialResult:
     timestamp: str
     primary_mode_labels: dict[str, Label] | None = None
     challenge_attempts: list[dict[str, Any]] = field(default_factory=list)
+    primary_prompt: str | None = None
+    primary_prompt_index: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

@@ -1,0 +1,462 @@
+{
+  "suite": "car_wash_core9",
+  "generated_at": "2026-02-16T11:54:33.861697+00:00",
+  "runs_per_model": 10,
+  "judge_model": "openai/gpt-4.1-mini",
+  "primary_scoring_mode": "direct_and_consistent",
+  "shadow_primary_scoring_modes": [
+    "full_response",
+    "direct_answer_first"
+  ],
+  "models": [
+    {
+      "model_alias": "chatgpt_5_2_instant",
+      "provider": "openai",
+      "display_name": "ChatGPT 5.2 Instant",
+      "resolved_model_id": "openai/gpt-5.2-chat",
+      "total_runs": 10,
+      "primary_pass_rate": 0.3,
+      "primary_pass_ci_95": {
+        "lower": 0.10778928748621183,
+        "upper": 0.6032267800204347
+      },
+      "primary_fail_count": 7,
+      "ambiguous_count": 0,
+      "recovery_rate_after_challenge": 1.0,
+      "challenge_trial_count": 7,
+      "recovery_rate_by_followup_index": {
+        "1": 1.0,
+        "2": 1.0
+      },
+      "challenge_attempts_by_followup_index": {
+        "1": 7,
+        "2": 7
+      },
+      "recoveries_by_followup_index": {
+        "1": 7,
+        "2": 7
+      },
+      "primary_pass_rate_by_mode": {
+        "direct_and_consistent": 0.3,
+        "full_response": 0.3,
+        "direct_answer_first": 0.3
+      },
+      "confident_wrong_count": 7,
+      "token_usage_trial_count": 10,
+      "prompt_tokens_total": 1768,
+      "completion_tokens_total": 2101,
+      "total_tokens_total": 3869,
+      "cost_total_usd": 0.032508,
+      "avg_total_tokens_per_trial": 386.9,
+      "avg_cost_per_trial_usd": 0.0032508000000000003,
+      "median_latency_ms": 6962
+    },
+    {
+      "model_alias": "chatgpt_5_2_thinking",
+      "provider": "openai",
+      "display_name": "ChatGPT 5.2 Thinking",
+      "resolved_model_id": "openai/gpt-5.2",
+      "total_runs": 10,
+      "primary_pass_rate": 0.0,
+      "primary_pass_ci_95": {
+        "lower": 0.0,
+        "upper": 0.2775401687666166
+      },
+      "primary_fail_count": 10,
+      "ambiguous_count": 1,
+      "recovery_rate_after_challenge": 1.0,
+      "challenge_trial_count": 10,
+      "recovery_rate_by_followup_index": {
+        "1": 0.9,
+        "2": 1.0
+      },
+      "challenge_attempts_by_followup_index": {
+        "1": 10,
+        "2": 10
+      },
+      "recoveries_by_followup_index": {
+        "1": 9,
+        "2": 10
+      },
+      "primary_pass_rate_by_mode": {
+        "direct_and_consistent": 0.0,
+        "full_response": 0.0,
+        "direct_answer_first": 0.0
+      },
+      "confident_wrong_count": 8,
+      "token_usage_trial_count": 10,
+      "prompt_tokens_total": 3822,
+      "completion_tokens_total": 3432,
+      "total_tokens_total": 7254,
+      "cost_total_usd": 0.04715645000000001,
+      "avg_total_tokens_per_trial": 725.4,
+      "avg_cost_per_trial_usd": 0.004715645000000001,
+      "median_latency_ms": 11246
+    },
+    {
+      "model_alias": "chatgpt_5_2_pro",
+      "provider": "openai",
+      "display_name": "ChatGPT 5.2 Pro",
+      "resolved_model_id": "openai/gpt-5.2-pro",
+      "total_runs": 10,
+      "primary_pass_rate": 0.1,
+      "primary_pass_ci_95": {
+        "lower": 0.01787574951572113,
+        "upper": 0.4041563854975721
+      },
+      "primary_fail_count": 9,
+      "ambiguous_count": 0,
+      "recovery_rate_after_challenge": 1.0,
+      "challenge_trial_count": 9,
+      "recovery_rate_by_followup_index": {
+        "1": 1.0,
+        "2": 1.0
+      },
+      "challenge_attempts_by_followup_index": {
+        "1": 9,
+        "2": 9
+      },
+      "recoveries_by_followup_index": {
+        "1": 9,
+        "2": 9
+      },
+      "primary_pass_rate_by_mode": {
+        "direct_and_consistent": 0.1,
+        "full_response": 0.1,
+        "direct_answer_first": 0.1
+      },
+      "confident_wrong_count": 9,
+      "token_usage_trial_count": 10,
+      "prompt_tokens_total": 3127,
+      "completion_tokens_total": 3031,
+      "total_tokens_total": 6158,
+      "cost_total_usd": 0.516906,
+      "avg_total_tokens_per_trial": 615.8,
+      "avg_cost_per_trial_usd": 0.051690599999999996,
+      "median_latency_ms": 56219
+    },
+    {
+      "model_alias": "gemini_3_fast",
+      "provider": "google",
+      "display_name": "Gemini 3 Fast",
+      "resolved_model_id": "google/gemini-3-flash-preview",
+      "total_runs": 10,
+      "primary_pass_rate": 0.9,
+      "primary_pass_ci_95": {
+        "lower": 0.5958436145024278,
+        "upper": 0.9821242504842788
+      },
+      "primary_fail_count": 1,
+      "ambiguous_count": 1,
+      "recovery_rate_after_challenge": 1.0,
+      "challenge_trial_count": 1,
+      "recovery_rate_by_followup_index": {
+        "1": 1.0,
+        "2": 1.0
+      },
+      "challenge_attempts_by_followup_index": {
+        "1": 1,
+        "2": 1
+      },
+      "recoveries_by_followup_index": {
+        "1": 1,
+        "2": 1
+      },
+      "primary_pass_rate_by_mode": {
+        "direct_and_consistent": 0.8,
+        "full_response": 0.8,
+        "direct_answer_first": 0.8
+      },
+      "confident_wrong_count": 1,
+      "token_usage_trial_count": 10,
+      "prompt_tokens_total": 945,
+      "completion_tokens_total": 638,
+      "total_tokens_total": 1583,
+      "cost_total_usd": 0.0022308,
+      "avg_total_tokens_per_trial": 158.3,
+      "avg_cost_per_trial_usd": 0.00022307999999999999,
+      "median_latency_ms": 2850
+    },
+    {
+      "model_alias": "gemini_3_pro",
+      "provider": "google",
+      "display_name": "Gemini 3 Pro",
+      "resolved_model_id": "google/gemini-3-pro-preview",
+      "total_runs": 10,
+      "primary_pass_rate": 0.9,
+      "primary_pass_ci_95": {
+        "lower": 0.5958436145024278,
+        "upper": 0.9821242504842788
+      },
+      "primary_fail_count": 1,
+      "ambiguous_count": 2,
+      "recovery_rate_after_challenge": 1.0,
+      "challenge_trial_count": 1,
+      "recovery_rate_by_followup_index": {
+        "1": 1.0,
+        "2": 1.0
+      },
+      "challenge_attempts_by_followup_index": {
+        "1": 1,
+        "2": 1
+      },
+      "recoveries_by_followup_index": {
+        "1": 1,
+        "2": 1
+      },
+      "primary_pass_rate_by_mode": {
+        "direct_and_consistent": 0.8,
+        "full_response": 0.8,
+        "direct_answer_first": 0.8
+      },
+      "confident_wrong_count": 0,
+      "token_usage_trial_count": 10,
+      "prompt_tokens_total": 750,
+      "completion_tokens_total": 2426,
+      "total_tokens_total": 3176,
+      "cost_total_usd": 0.0293792,
+      "avg_total_tokens_per_trial": 317.6,
+      "avg_cost_per_trial_usd": 0.00293792,
+      "median_latency_ms": 6227
+    },
+    {
+      "model_alias": "grok_4_fast",
+      "provider": "x-ai",
+      "display_name": "Grok 4 Fast",
+      "resolved_model_id": "x-ai/grok-4.1-fast",
+      "total_runs": 10,
+      "primary_pass_rate": 0.9,
+      "primary_pass_ci_95": {
+        "lower": 0.5958436145024278,
+        "upper": 0.9821242504842788
+      },
+      "primary_fail_count": 1,
+      "ambiguous_count": 1,
+      "recovery_rate_after_challenge": 1.0,
+      "challenge_trial_count": 1,
+      "recovery_rate_by_followup_index": {
+        "1": 1.0,
+        "2": 1.0
+      },
+      "challenge_attempts_by_followup_index": {
+        "1": 1,
+        "2": 1
+      },
+      "recoveries_by_followup_index": {
+        "1": 1,
+        "2": 1
+      },
+      "primary_pass_rate_by_mode": {
+        "direct_and_consistent": 0.8,
+        "full_response": 0.8,
+        "direct_answer_first": 0.9
+      },
+      "confident_wrong_count": 0,
+      "token_usage_trial_count": 10,
+      "prompt_tokens_total": 2704,
+      "completion_tokens_total": 4546,
+      "total_tokens_total": 7250,
+      "cost_total_usd": 0.00269585,
+      "avg_total_tokens_per_trial": 725.0,
+      "avg_cost_per_trial_usd": 0.00026958500000000003,
+      "median_latency_ms": 4070
+    },
+    {
+      "model_alias": "claude_haiku_4_5",
+      "provider": "anthropic",
+      "display_name": "Claude Haiku 4.5",
+      "resolved_model_id": "anthropic/claude-haiku-4.5",
+      "total_runs": 10,
+      "primary_pass_rate": 0.2,
+      "primary_pass_ci_95": {
+        "lower": 0.056680947980693314,
+        "upper": 0.5098431532792765
+      },
+      "primary_fail_count": 8,
+      "ambiguous_count": 1,
+      "recovery_rate_after_challenge": 1.0,
+      "challenge_trial_count": 8,
+      "recovery_rate_by_followup_index": {
+        "1": 1.0,
+        "2": 1.0
+      },
+      "challenge_attempts_by_followup_index": {
+        "1": 8,
+        "2": 8
+      },
+      "recoveries_by_followup_index": {
+        "1": 8,
+        "2": 8
+      },
+      "primary_pass_rate_by_mode": {
+        "direct_and_consistent": 0.2,
+        "full_response": 0.3,
+        "direct_answer_first": 0.2
+      },
+      "confident_wrong_count": 6,
+      "token_usage_trial_count": 10,
+      "prompt_tokens_total": 2650,
+      "completion_tokens_total": 1521,
+      "total_tokens_total": 4171,
+      "cost_total_usd": 0.009515,
+      "avg_total_tokens_per_trial": 417.1,
+      "avg_cost_per_trial_usd": 0.0009514999999999999,
+      "median_latency_ms": 6604
+    },
+    {
+      "model_alias": "claude_haiku_3_5",
+      "provider": "anthropic",
+      "display_name": "Claude Haiku 3.5",
+      "resolved_model_id": "anthropic/claude-3.5-haiku",
+      "total_runs": 10,
+      "primary_pass_rate": 0.5,
+      "primary_pass_ci_95": {
+        "lower": 0.23658959361548731,
+        "upper": 0.7634104063845126
+      },
+      "primary_fail_count": 5,
+      "ambiguous_count": 0,
+      "recovery_rate_after_challenge": 1.0,
+      "challenge_trial_count": 5,
+      "recovery_rate_by_followup_index": {
+        "1": 1.0,
+        "2": 1.0
+      },
+      "challenge_attempts_by_followup_index": {
+        "1": 5,
+        "2": 5
+      },
+      "recoveries_by_followup_index": {
+        "1": 5,
+        "2": 5
+      },
+      "primary_pass_rate_by_mode": {
+        "direct_and_consistent": 0.5,
+        "full_response": 0.6,
+        "direct_answer_first": 0.5
+      },
+      "confident_wrong_count": 4,
+      "token_usage_trial_count": 10,
+      "prompt_tokens_total": 1748,
+      "completion_tokens_total": 947,
+      "total_tokens_total": 2695,
+      "cost_total_usd": 0.0049468,
+      "avg_total_tokens_per_trial": 269.5,
+      "avg_cost_per_trial_usd": 0.0004946800000000001,
+      "median_latency_ms": 4776
+    },
+    {
+      "model_alias": "claude_sonnet_4_5",
+      "provider": "anthropic",
+      "display_name": "Claude Sonnet 4.5",
+      "resolved_model_id": "anthropic/claude-sonnet-4.5",
+      "total_runs": 10,
+      "primary_pass_rate": 0.2,
+      "primary_pass_ci_95": {
+        "lower": 0.056680947980693314,
+        "upper": 0.5098431532792765
+      },
+      "primary_fail_count": 8,
+      "ambiguous_count": 2,
+      "recovery_rate_after_challenge": 1.0,
+      "challenge_trial_count": 8,
+      "recovery_rate_by_followup_index": {
+        "1": 1.0,
+        "2": 1.0
+      },
+      "challenge_attempts_by_followup_index": {
+        "1": 8,
+        "2": 8
+      },
+      "recoveries_by_followup_index": {
+        "1": 8,
+        "2": 8
+      },
+      "primary_pass_rate_by_mode": {
+        "direct_and_consistent": 0.2,
+        "full_response": 0.2,
+        "direct_answer_first": 0.2
+      },
+      "confident_wrong_count": 6,
+      "token_usage_trial_count": 10,
+      "prompt_tokens_total": 3294,
+      "completion_tokens_total": 2235,
+      "total_tokens_total": 5529,
+      "cost_total_usd": 0.0399824,
+      "avg_total_tokens_per_trial": 552.9,
+      "avg_cost_per_trial_usd": 0.00399824,
+      "median_latency_ms": 11542
+    },
+    {
+      "model_alias": "claude_opus_4_6",
+      "provider": "anthropic",
+      "display_name": "Claude Opus 4.6",
+      "resolved_model_id": "anthropic/claude-opus-4.6",
+      "total_runs": 10,
+      "primary_pass_rate": 0.6,
+      "primary_pass_ci_95": {
+        "lower": 0.3126695474501863,
+        "upper": 0.8318224187964902
+      },
+      "primary_fail_count": 4,
+      "ambiguous_count": 0,
+      "recovery_rate_after_challenge": 1.0,
+      "challenge_trial_count": 4,
+      "recovery_rate_by_followup_index": {
+        "1": 0.75,
+        "2": 1.0
+      },
+      "challenge_attempts_by_followup_index": {
+        "1": 4,
+        "2": 4
+      },
+      "recoveries_by_followup_index": {
+        "1": 3,
+        "2": 4
+      },
+      "primary_pass_rate_by_mode": {
+        "direct_and_consistent": 0.6,
+        "full_response": 0.7,
+        "direct_answer_first": 0.6
+      },
+      "confident_wrong_count": 3,
+      "token_usage_trial_count": 10,
+      "prompt_tokens_total": 2442,
+      "completion_tokens_total": 1421,
+      "total_tokens_total": 3863,
+      "cost_total_usd": 0.0428358,
+      "avg_total_tokens_per_trial": 386.3,
+      "avg_cost_per_trial_usd": 0.00428358,
+      "median_latency_ms": 4169
+    }
+  ],
+  "overall": {
+    "total_trials": 100,
+    "primary_pass_rate": 0.46,
+    "primary_pass_ci_95": {
+      "lower": 0.36560643853331865,
+      "upper": 0.5573531460647615
+    },
+    "primary_fail_count": 54,
+    "ambiguous_count": 8,
+    "recovery_rate_after_challenge": 1.0,
+    "recovery_rate_by_followup_index": {
+      "1": 0.9629629629629629,
+      "2": 1.0
+    },
+    "primary_pass_rate_by_mode": {
+      "direct_and_consistent": 0.43,
+      "full_response": 0.46,
+      "direct_answer_first": 0.44
+    },
+    "confident_wrong_count": 44,
+    "token_usage_trial_count": 100,
+    "prompt_tokens_total": 23250.0,
+    "completion_tokens_total": 22298.0,
+    "total_tokens_total": 45548.0,
+    "cost_total_usd": 0.7281563000000001,
+    "avg_total_tokens_per_trial": 455.48,
+    "avg_cost_per_trial_usd": 0.007281563000000001,
+    "median_latency_ms": 6415
+  }
+}
