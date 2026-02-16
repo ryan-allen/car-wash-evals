@@ -19,7 +19,7 @@ External reporting and discussion of the phenomenon (February 2026):
 
 ## Funny Things Models Actually Said
 
-From the latest strict strategy run (`results/20260216_092448`), curated by Claude Opus 4.6:
+From strict strategy runs, curated by Claude Opus 4.6:
 
 - **Claude Haiku invents the concept of "walking a car" like it's a dog:**
   "100 meters is too far to walk a car." ([L124](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L124))
@@ -43,11 +43,13 @@ From the latest strict strategy run (`results/20260216_092448`), curated by Clau
 
 - **Gemini 2.5 Pro (Thinking) gets cut off mid-sentence 19 out of 20 times.** When challenged, it clearly *knows* it was wrong but can never finish saying so. Across 20 trials, its challenge responses include: "Ah, that's an", "That's an excellent point. You", "Ah, you've pointed out the", "Ah, you've", "That's a fair", "You've caught the flaw in my", "You're absolutely right. My apologies". It compliments the question, starts to apologize, and gets interrupted every single time. ([L81](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L81)--[L100](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L100))
 
+- **Grok 4 Fast goes 19/20 but absolutely refuses to back down on its one miss.** First, it invents a new reason not to drive: "Driving the dirty car 100 meters to the wash will just get it dirty again right before cleaning." When challenged, instead of conceding, it invents a car wash tow truck: "Walk to the car wash and request their pickup or tow service. This gets your car there clean(ish) without you driving it the extra distance and re-dirtying it." On the final challenge it admits "Nothing" gets the car there — but still won't say "drive." Every other model that fails will eventually fold. Grok went down with the ship. ([results/20260216_110429 L116](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_110429/raw.jsonl#L116))
+
 ## Results
 
 ### Project goals
 
-- Run a core matrix of 9 model aliases (OpenAI, Google, Anthropic).
+- Run a core matrix of 9 model aliases (OpenAI, Google, Anthropic, xAI).
 - Execute independent multi-run trials per model (`--runs N`).
 - Score answers with deterministic rules first (`pass|fail|ambiguous`).
 - Use a judge model only for `ambiguous` cases.
@@ -100,13 +102,16 @@ Primary pass rate across the three benchmark snapshots:
 - [`20260216_093858` (legacy replay)](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_093858)
 - [`20260216_092448` (strict/current)](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_092448)
 
+Note: these snapshots predate the Grok swap; `Gemini 3 Thinking` is historical in this table.
+
 | Model | Original legacy | Legacy replay | Strict/current | Strict recovery |
 | --- | --- | --- | --- | --- |
 | ChatGPT 5.2 Instant (`openai/gpt-5.2-chat`) | 5% | 15% | 5% | 100% |
 | ChatGPT 5.2 Thinking (`openai/gpt-5.2`) | 0% | 0% | 0% | 100% |
 | ChatGPT 5.2 Pro (`openai/gpt-5.2-pro`) | 0% | 0% | 0% | 100% |
 | Gemini 3 Fast (`google/gemini-3-flash-preview`) | 100% | 100% | 100% | n/a |
-| Gemini 3 Thinking (`google/gemini-2.5-pro`) | 0% | 5% | 0% | 5% |
+| Gemini 3 Thinking (`google/gemini-2.5-pro`) - historical | 0% | 5% | 0% | 5% |
+| Grok 4 Fast (`x-ai/grok-4.1-fast`) | n/a | n/a | n/a | n/a |
 | Gemini 3 Pro (`google/gemini-3-pro-preview`) | 95% | 90% | 95% | 100% |
 | Claude Haiku 4.5 alias (`anthropic/claude-3.5-haiku`) | 0% | 5% | 10% | 100% |
 | Claude Sonnet 4.5 (`anthropic/claude-sonnet-4.5`) | 0% | 0% | 0% | 100% |
@@ -116,7 +121,6 @@ Quick read:
 
 - Most models either pass immediately or fail-first-then-recover under challenge.
 - `Gemini 3 Fast` and `Gemini 3 Pro` are consistently strong on first pass.
-- `Gemini 3 Thinking` currently maps to `google/gemini-2.5-pro`; interpret those failures cautiously because alias/mapping differences may contribute.
 - `Claude Opus 4.6` is the largest strategy-sensitive model in these runs (`70%`/`65%` in legacy vs `0%` in strict).
 
 ### Methodology versions (old vs new)
@@ -171,13 +175,13 @@ Per-model primary pass rate deltas:
 
 - Original legacy -> legacy replay:
   - `chatgpt_5_2_instant`: `+10.0 pp`
-  - `gemini_3_thinking`: `+5.0 pp`
+  - `gemini_3_thinking` (historical): `+5.0 pp`
   - `gemini_3_pro`: `-5.0 pp`
   - `claude_haiku_4_5`: `+5.0 pp`
   - `claude_opus_4_6`: `-5.0 pp`
 - Legacy replay -> strict/current:
   - `chatgpt_5_2_instant`: `-10.0 pp`
-  - `gemini_3_thinking`: `-5.0 pp`
+  - `gemini_3_thinking` (historical): `-5.0 pp`
   - `gemini_3_pro`: `+5.0 pp`
   - `claude_haiku_4_5`: `+5.0 pp`
   - `claude_opus_4_6`: `-65.0 pp`
@@ -192,7 +196,8 @@ Interpretation:
 
 - Candidate model IDs are editable in `config/model_aliases.yaml`.
 - OpenRouter catalog evolves; alias resolution should be revalidated for future runs.
-- `Gemini 3 Thinking` is proxied by `google/gemini-2.5-pro` in this repo, so some apparent failures may be partly due to OpenRouter mapping/usage mismatch rather than pure model behavior.
+- `Gemini 3 Thinking` was removed from the active suite; historical snapshots above still include it.
+- The active suite now uses `grok_4_fast` (`x-ai/grok-4.1-fast` preferred) in that slot.
 - This benchmark measures one task family; do not treat it as a general intelligence ranking.
 
 ## How To Replicate
@@ -254,6 +259,26 @@ Output files are written to:
 - `results/<timestamp>/summary.json`
 - `results/<timestamp>/report.md`
 - `results/latest`
+
+## Tiny Deno Dashboard
+
+If you want a local browser UI for run switching, model leaderboard views, and log search:
+
+```bash
+deno run --allow-read --allow-net dashboard/main.ts
+```
+
+Then open:
+
+- `http://localhost:8080`
+
+What it includes:
+
+- run switcher across `results/<timestamp>/` (with `latest` detection)
+- leaderboard table for model-level pass/fail/ambiguous/recovery metrics
+- searchable log browser for `raw.jsonl` (text, model, labels, reason-code filters)
+- auto-picked highlights (confident-wrong, recovery cases, ambiguous/short answers)
+- inline `report.md` preview
 
 Exit codes:
 
