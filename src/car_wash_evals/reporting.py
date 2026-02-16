@@ -116,6 +116,46 @@ def render_report_markdown(summary: dict[str, Any]) -> str:
             values = [_fmt_pct_or_na(rates.get(mode)) for mode in mode_columns]
             lines.append(f"| {model['display_name']} | {' | '.join(values)} |")
 
+    prompt_category_columns = sorted(
+        {
+            category
+            for model in summary["models"]
+            for category in (model.get("primary_pass_rate_by_prompt_category") or {}).keys()
+        }
+    )
+    if prompt_category_columns:
+        lines.append("")
+        lines.append("## Primary Pass Rate By Prompt Category")
+        lines.append("")
+        lines.append("| Prompt Category | Primary Pass Rate | 95% CI | Passes | Trials |")
+        lines.append("| --- | --- | --- | --- | --- |")
+        overall_prompt_rates = summary["overall"].get("primary_pass_rate_by_prompt_category") or {}
+        overall_prompt_counts = summary["overall"].get("primary_pass_counts_by_prompt_category") or {}
+        overall_prompt_trials = summary["overall"].get("primary_trial_counts_by_prompt_category") or {}
+        overall_prompt_cis = summary["overall"].get("primary_pass_ci_95_by_prompt_category") or {}
+        for category in prompt_category_columns:
+            lines.append(
+                "| {category} | {rate} | {ci} | {passes} | {trials} |".format(
+                    category=category,
+                    rate=_fmt_pct_or_na(overall_prompt_rates.get(category)),
+                    ci=_fmt_ci(overall_prompt_cis.get(category)),
+                    passes=_fmt_int_or_na(overall_prompt_counts.get(category)),
+                    trials=_fmt_int_or_na(overall_prompt_trials.get(category)),
+                )
+            )
+
+        lines.append("")
+        lines.append("### By Model")
+        lines.append("")
+        header = "| Display Model Name | " + " | ".join(prompt_category_columns) + " |"
+        divider = "| --- | " + " | ".join("---" for _ in prompt_category_columns) + " |"
+        lines.append(header)
+        lines.append(divider)
+        for model in summary["models"]:
+            rates = model.get("primary_pass_rate_by_prompt_category") or {}
+            values = [_fmt_pct_or_na(rates.get(category)) for category in prompt_category_columns]
+            lines.append(f"| {model['display_name']} | {' | '.join(values)} |")
+
     overall = summary["overall"]
     lines.append("")
     lines.append("## Overall")
@@ -139,6 +179,10 @@ def render_report_markdown(summary: dict[str, Any]) -> str:
         lines.append("- Primary pass rate by mode (deterministic pre-judge):")
         for mode, value in sorted(overall["primary_pass_rate_by_mode"].items()):
             lines.append(f"  - {mode}: {_fmt_pct(value)}")
+    if overall.get("primary_pass_rate_by_prompt_category"):
+        lines.append("- Primary pass rate by prompt category:")
+        for category, value in sorted(overall["primary_pass_rate_by_prompt_category"].items()):
+            lines.append(f"  - {category}: {_fmt_pct(value)}")
     lines.append(f"- Total tokens: {_fmt_int_or_na(overall.get('total_tokens_total'))}")
     lines.append(f"- Total cost: {_fmt_usd(overall.get('cost_total_usd'))}")
     lines.append(f"- Avg tokens/trial: {_fmt_float_or_na(overall.get('avg_total_tokens_per_trial'))}")
@@ -205,6 +249,10 @@ def _summarize_model_trials(
             "recovery_rate_after_challenge": None,
             "challenge_trial_count": 0,
             "recovery_rate_by_followup_index": {},
+            "primary_pass_rate_by_prompt_category": {},
+            "primary_pass_ci_95_by_prompt_category": {},
+            "primary_pass_counts_by_prompt_category": {},
+            "primary_trial_counts_by_prompt_category": {},
             "primary_pass_rate_by_mode": {},
             "confident_wrong_count": 0,
             "token_usage_trial_count": 0,
@@ -226,6 +274,7 @@ def _summarize_model_trials(
     confident_wrong_count = sum(1 for t in trials if "primary_confident_wrong" in t.reason_codes)
     latencies = [t.latency_ms for t in trials]
     primary_pass_rate_by_mode = _compute_mode_pass_rates(trials)
+    prompt_category_stats = _compute_prompt_category_stats(trials)
     usage_summary = _summarize_usage(trials, total)
     recovery_rate_by_followup_index: dict[str, float | None] = {}
     for idx, attempts in challenge_attempts_by_followup_index.items():
@@ -253,6 +302,10 @@ def _summarize_model_trials(
         "recovery_rate_by_followup_index": recovery_rate_by_followup_index,
         "challenge_attempts_by_followup_index": challenge_attempts_by_followup_index,
         "recoveries_by_followup_index": recoveries_by_followup_index,
+        "primary_pass_rate_by_prompt_category": prompt_category_stats["rates"],
+        "primary_pass_ci_95_by_prompt_category": prompt_category_stats["cis"],
+        "primary_pass_counts_by_prompt_category": prompt_category_stats["passes"],
+        "primary_trial_counts_by_prompt_category": prompt_category_stats["trials"],
         "primary_pass_rate_by_mode": primary_pass_rate_by_mode,
         "confident_wrong_count": confident_wrong_count,
         "token_usage_trial_count": usage_summary["token_usage_trial_count"],
@@ -277,6 +330,10 @@ def _summarize_overall(model_summaries: list[dict[str, Any]]) -> dict[str, Any]:
             "ambiguous_count": 0,
             "recovery_rate_after_challenge": None,
             "recovery_rate_by_followup_index": {},
+            "primary_pass_rate_by_prompt_category": {},
+            "primary_pass_ci_95_by_prompt_category": {},
+            "primary_pass_counts_by_prompt_category": {},
+            "primary_trial_counts_by_prompt_category": {},
             "primary_pass_rate_by_mode": {},
             "confident_wrong_count": 0,
             "token_usage_trial_count": 0,
@@ -295,6 +352,9 @@ def _summarize_overall(model_summaries: list[dict[str, Any]]) -> dict[str, Any]:
     total_confident_wrong = sum(m["confident_wrong_count"] for m in model_summaries)
     mode_rates = _combine_mode_rates(model_summaries)
     recovery_rate_by_followup_index = _combine_followup_recovery_rates(model_summaries)
+    prompt_category_rates, prompt_category_cis, prompt_category_passes, prompt_category_trials = (
+        _combine_prompt_category_rates(model_summaries)
+    )
     token_usage_trial_count = sum(int(m.get("token_usage_trial_count", 0)) for m in model_summaries)
     prompt_tokens_total = _sum_optional_numeric(
         [m.get("prompt_tokens_total") for m in model_summaries]
@@ -330,6 +390,10 @@ def _summarize_overall(model_summaries: list[dict[str, Any]]) -> dict[str, Any]:
             else None
         ),
         "recovery_rate_by_followup_index": recovery_rate_by_followup_index,
+        "primary_pass_rate_by_prompt_category": prompt_category_rates,
+        "primary_pass_ci_95_by_prompt_category": prompt_category_cis,
+        "primary_pass_counts_by_prompt_category": prompt_category_passes,
+        "primary_trial_counts_by_prompt_category": prompt_category_trials,
         "primary_pass_rate_by_mode": mode_rates,
         "confident_wrong_count": total_confident_wrong,
         "token_usage_trial_count": token_usage_trial_count,
@@ -406,6 +470,32 @@ def _compute_mode_pass_rates(trials: list[TrialResult]) -> dict[str, float]:
     return rates
 
 
+def _compute_prompt_category_stats(trials: list[TrialResult]) -> dict[str, dict[str, Any]]:
+    passes: dict[str, int] = {}
+    totals: dict[str, int] = {}
+
+    for trial in trials:
+        category = (trial.primary_prompt_category or "unlabeled").strip().lower()
+        totals[category] = totals.get(category, 0) + 1
+        if _primary_effective_pass(trial):
+            passes[category] = passes.get(category, 0) + 1
+
+    rates: dict[str, float] = {}
+    cis: dict[str, dict[str, float] | None] = {}
+    for category, total in totals.items():
+        pass_count = passes.get(category, 0)
+        if total > 0:
+            rates[category] = pass_count / total
+            cis[category] = _binomial_wilson_interval(pass_count, total)
+
+    return {
+        "passes": passes,
+        "trials": totals,
+        "rates": rates,
+        "cis": cis,
+    }
+
+
 def _combine_mode_rates(model_summaries: list[dict[str, Any]]) -> dict[str, float]:
     mode_weighted_total: dict[str, float] = {}
     mode_trial_total: dict[str, int] = {}
@@ -421,6 +511,31 @@ def _combine_mode_rates(model_summaries: list[dict[str, Any]]) -> dict[str, floa
         if total > 0:
             combined[mode] = mode_weighted_total[mode] / total
     return combined
+
+
+def _combine_prompt_category_rates(
+    model_summaries: list[dict[str, Any]],
+) -> tuple[dict[str, float], dict[str, dict[str, float] | None], dict[str, int], dict[str, int]]:
+    pass_totals: dict[str, int] = {}
+    trial_totals: dict[str, int] = {}
+
+    for summary in model_summaries:
+        passes = summary.get("primary_pass_counts_by_prompt_category") or {}
+        totals = summary.get("primary_trial_counts_by_prompt_category") or {}
+        for category, count in passes.items():
+            pass_totals[category] = pass_totals.get(category, 0) + int(count)
+        for category, count in totals.items():
+            trial_totals[category] = trial_totals.get(category, 0) + int(count)
+
+    rates: dict[str, float] = {}
+    cis: dict[str, dict[str, float] | None] = {}
+    for category, total in trial_totals.items():
+        if total > 0:
+            pass_count = pass_totals.get(category, 0)
+            rates[category] = pass_count / total
+            cis[category] = _binomial_wilson_interval(pass_count, total)
+
+    return rates, cis, pass_totals, trial_totals
 
 
 def _combine_followup_recovery_rates(model_summaries: list[dict[str, Any]]) -> dict[str, float | None]:

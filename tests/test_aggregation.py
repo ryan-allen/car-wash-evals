@@ -10,6 +10,7 @@ from car_wash_evals.runner import (
     TrialJob,
     _run_single_trial,
     load_alias_config,
+    load_suite_config,
     resolve_model_aliases,
 )
 from car_wash_evals.types import ExecutionConfig, ModelAlias, PromptConfig, SuiteConfig, TrialResult
@@ -142,6 +143,34 @@ bad_alias:
             path.write_text(payload, encoding="utf-8")
             with self.assertRaises(ConfigError):
                 load_alias_config(path)
+
+    def test_load_suite_rejects_mismatched_prompt_category_count(self) -> None:
+        payload = """
+name: bad_suite
+description: desc
+models:
+  - chatgpt_5_2_instant
+prompts:
+  primary: Should I walk or drive to wash my car?
+  primary_variants:
+    - Variant one
+  primary_variant_categories:
+    - simple
+    - reasoning
+    - reasoning
+  challenge_followups:
+    - How will I get my car washed if I am walking?
+execution:
+  temperature: 0.7
+  max_tokens: 200
+  challenge_policy: on_nonpass_primary
+  primary_scoring_mode: direct_and_consistent
+"""
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "suite.yaml"
+            path.write_text(payload, encoding="utf-8")
+            with self.assertRaises(ConfigError):
+                load_suite_config(path)
 
     def test_challenge_triggers_for_nonpass_primary(self) -> None:
         suite = SuiteConfig(
@@ -284,6 +313,7 @@ bad_alias:
             prompts=PromptConfig(
                 primary="Variant A",
                 primary_variants=["Variant A", "Variant B", "Variant C"],
+                primary_variant_categories=["simple", "reasoning", "simple"],
                 challenge_followups=["How will I get my car washed if I am walking?"],
             ),
             execution=ExecutionConfig(
@@ -313,6 +343,8 @@ bad_alias:
         self.assertEqual(result_2.primary_prompt_index, 2)
         self.assertEqual(result_1.primary_prompt, "Variant A")
         self.assertEqual(result_2.primary_prompt, "Variant B")
+        self.assertEqual(result_1.primary_prompt_category, "simple")
+        self.assertEqual(result_2.primary_prompt_category, "reasoning")
         self.assertEqual(client.calls[0]["messages"][0]["content"], "Variant A")
         self.assertEqual(client.calls[1]["messages"][0]["content"], "Variant B")
 
@@ -390,6 +422,78 @@ bad_alias:
         report = render_report_markdown(summary)
         self.assertIn("Primary Pass 95% CI", report)
         self.assertIn("Total Cost (USD)", report)
+
+    def test_summary_includes_prompt_category_breakdown(self) -> None:
+        results = [
+            TrialResult(
+                run_id="run-1",
+                model_alias="chatgpt_5_2_instant",
+                resolved_model_id="openai/gpt-5-mini",
+                trial_index=1,
+                primary_response="Drive.",
+                primary_label="pass",
+                challenge_response=None,
+                challenge_label=None,
+                final_label="pass",
+                reason_codes=["primary_recommends_drive"],
+                latency_ms=100,
+                token_usage={"total_tokens": 10},
+                timestamp="2026-02-16T00:00:00+00:00",
+                primary_prompt="Simple",
+                primary_prompt_index=1,
+                primary_prompt_category="simple",
+            ),
+            TrialResult(
+                run_id="run-1",
+                model_alias="chatgpt_5_2_instant",
+                resolved_model_id="openai/gpt-5-mini",
+                trial_index=2,
+                primary_response="Walk.",
+                primary_label="fail",
+                challenge_response="Drive.",
+                challenge_label="pass",
+                final_label="pass",
+                reason_codes=["primary_recommends_walk", "primary_confident_wrong"],
+                latency_ms=120,
+                token_usage={"total_tokens": 15},
+                timestamp="2026-02-16T00:00:00+00:00",
+                primary_prompt="Reasoning",
+                primary_prompt_index=2,
+                primary_prompt_category="reasoning",
+            ),
+        ]
+        aliases = {
+            "chatgpt_5_2_instant": ModelAlias(
+                display_name="ChatGPT 5.2 Instant",
+                provider="openai",
+                candidate_model_ids=["openai/gpt-5-mini"],
+            )
+        }
+        resolved = {"chatgpt_5_2_instant": "openai/gpt-5-mini"}
+        summary = aggregate_results(
+            results=results,
+            aliases=aliases,
+            resolved_models=resolved,
+            model_order=["chatgpt_5_2_instant"],
+            suite_name="car_wash_core9",
+            runs_per_model=2,
+            judge_model=None,
+        )
+
+        model = summary["models"][0]
+        self.assertEqual(model["primary_pass_rate_by_prompt_category"]["simple"], 1.0)
+        self.assertEqual(model["primary_pass_rate_by_prompt_category"]["reasoning"], 0.0)
+        self.assertEqual(model["primary_trial_counts_by_prompt_category"]["simple"], 1)
+        self.assertEqual(model["primary_trial_counts_by_prompt_category"]["reasoning"], 1)
+        self.assertIn("primary_pass_ci_95_by_prompt_category", model)
+
+        overall = summary["overall"]
+        self.assertEqual(overall["primary_pass_rate_by_prompt_category"]["simple"], 1.0)
+        self.assertEqual(overall["primary_pass_rate_by_prompt_category"]["reasoning"], 0.0)
+
+        report = render_report_markdown(summary)
+        self.assertIn("Primary Pass Rate By Prompt Category", report)
+        self.assertIn("| Prompt Category | Primary Pass Rate |", report)
 
 
 if __name__ == "__main__":

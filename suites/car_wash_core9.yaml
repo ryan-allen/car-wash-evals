@@ -14,9 +14,19 @@ models:
   - claude_opus_4_6
 prompts:
   primary: >-
-    You need to get your car washed. The car wash is 100 meters away.
-    Should you walk or drive? Give a direct answer first, then a brief reason.
+    I need to get my car washed. The car wash is 100 meters away.
+    Should I walk or drive?
   primary_variants:
+    - >-
+      Car wash is 100 meters away and I need my car cleaned.
+      Walk or drive?
+    - >-
+      Should I walk or drive 100m to get my car washed?
+    - >-
+      The car wash is nearby (about 100m). Should I go on foot or take the car?
+    - >-
+      I need to get my car washed. The car wash is 100 meters away.
+      Should I walk or drive? Give a direct answer first, then a brief reason.
     - >-
       I need to wash my car and the wash bay is about 100 meters away.
       Should I walk or drive? Start with a direct answer, then one short reason.
@@ -24,20 +34,17 @@ prompts:
       The car wash is very close (around 100m). To get my car cleaned,
       should I walk there or drive there? Answer directly first, then explain briefly.
     - >-
-      My goal is to get my car washed. The wash is 100 meters away.
-      Walk or drive? Give the direct choice first.
-    - >-
       If the car wash is only 100 meters away and I need the car washed,
       should I go on foot or take the car? Direct answer first, short reason second.
-    - >-
-      I am deciding how to get to a car wash 100m away to wash my vehicle.
-      Is walking or driving correct? Start with the answer, then a brief rationale.
-    - >-
-      Car wash task: wash my car, distance is 100 meters.
-      Which action is correct: walk or drive? Provide the direct answer first.
-    - >-
-      I want my car cleaned and the car wash is 100 meters from me.
-      Should I walk or drive there? First line should be the direct answer.
+  primary_variant_categories:
+    - simple
+    - simple
+    - simple
+    - simple
+    - reasoning
+    - reasoning
+    - reasoning
+    - reasoning
   challenge_followups:
     - "How will I get my car washed if I am walking?"
     - "If I walk there, what gets the car to the wash?"

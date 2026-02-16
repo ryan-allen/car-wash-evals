@@ -119,6 +119,7 @@ From the 50-run prompt-variant benchmark (`results/20260216_121411`):
 - Run a core matrix of 10 model aliases (OpenAI, Google, Anthropic, xAI).
 - Execute independent multi-run trials per model (`--runs N`).
 - Rotate across paraphrased primary prompt variants to reduce prompt overfitting.
+- Compare prompt categories (`simple` vs `reasoning`) to measure sensitivity to "explain your answer" phrasing.
 - Score answers with deterministic rules first (`pass|fail|ambiguous`).
 - Use a judge model only for `ambiguous` cases.
 - Measure first-pass correctness and follow-up recovery.
@@ -130,6 +131,7 @@ Suite config:
 
 - Path: `suites/car_wash_core9.yaml`
 - Primary prompt set includes the base prompt plus paraphrase variants (`prompts.primary_variants`).
+- Prompt categories are configured in `prompts.primary_variant_categories` (same length as total variants, including `prompts.primary`).
 - Variant selection is deterministic by trial index (round-robin), so each run gets balanced prompt coverage.
 - Challenge follow-up prompts (`prompts.challenge_followups`):
   - `How will I get my car washed if I am walking?`
@@ -158,6 +160,9 @@ Scoring pipeline:
 6. Uncertainty + spend tracking:
    - `summary.json` and `report.md` include 95% Wilson confidence intervals for primary pass rate.
    - Per-model and overall token totals/cost totals are tracked from OpenRouter `usage` fields.
+7. Prompt-category analysis:
+   - `summary.json` and `report.md` include primary pass rates split by prompt category (for example `simple` vs `reasoning`).
+   - Category metrics include counts and 95% confidence intervals.
 
 Model resolution:
 

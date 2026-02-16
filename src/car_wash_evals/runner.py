@@ -138,11 +138,16 @@ def load_suite_config(path: Path) -> SuiteConfig:
         raise ConfigError("Suite config requires prompts mapping")
     primary = _required_str(prompts_data, "primary")
     primary_variants = _parse_primary_variants(prompts_data, primary)
+    primary_variant_categories = _parse_primary_variant_categories(
+        prompts_data=prompts_data,
+        variant_count=len(primary_variants),
+    )
     challenge_followups = _parse_challenge_followups(prompts_data)
     prompts = PromptConfig(
         primary=primary,
         challenge_followups=challenge_followups,
         primary_variants=primary_variants,
+        primary_variant_categories=primary_variant_categories,
     )
 
     exec_data = data.get("execution")
@@ -336,7 +341,7 @@ def _run_single_trial(
     start_time = time.perf_counter()
     usage_total: dict[str, Any] | None = None
     reason_codes: list[str] = []
-    primary_prompt_index, primary_prompt = _select_primary_prompt(
+    primary_prompt_index, primary_prompt, primary_prompt_category = _select_primary_prompt(
         prompts=suite.prompts,
         trial_index=job.trial_index,
     )
@@ -448,6 +453,7 @@ def _run_single_trial(
         challenge_attempts=challenge_attempts,
         primary_prompt=primary_prompt,
         primary_prompt_index=primary_prompt_index,
+        primary_prompt_category=primary_prompt_category,
     )
 
 @dataclass(frozen=True)
@@ -558,22 +564,39 @@ def _parse_primary_variants(prompts_data: dict[str, Any], primary: str) -> list[
         raise ConfigError("prompts.primary_variants must be a non-empty list of strings")
 
     variants: list[str] = [primary]
-    seen = {primary}
     for item in raw_variants:
         if not isinstance(item, str) or not item.strip():
             raise ConfigError("prompts.primary_variants must contain non-empty strings")
         normalized = item.strip()
-        if normalized in seen:
-            continue
-        seen.add(normalized)
         variants.append(normalized)
     return variants
 
 
-def _select_primary_prompt(prompts: PromptConfig, trial_index: int) -> tuple[int, str]:
+def _parse_primary_variant_categories(prompts_data: dict[str, Any], variant_count: int) -> list[str]:
+    raw_categories = prompts_data.get("primary_variant_categories")
+    if raw_categories is None:
+        return ["unlabeled" for _ in range(variant_count)]
+    if not isinstance(raw_categories, list) or not raw_categories:
+        raise ConfigError("prompts.primary_variant_categories must be a non-empty list of strings")
+    if len(raw_categories) != variant_count:
+        raise ConfigError(
+            "prompts.primary_variant_categories length must match total primary variant count "
+            f"({variant_count}, including prompts.primary)"
+        )
+
+    categories: list[str] = []
+    for item in raw_categories:
+        if not isinstance(item, str) or not item.strip():
+            raise ConfigError("prompts.primary_variant_categories must contain non-empty strings")
+        categories.append(item.strip().lower())
+    return categories
+
+
+def _select_primary_prompt(prompts: PromptConfig, trial_index: int) -> tuple[int, str, str]:
     variants = prompts.all_primary_variants
+    categories = prompts.all_primary_variant_categories
     index = (trial_index - 1) % len(variants)
-    return index + 1, variants[index]
+    return index + 1, variants[index], categories[index]
 
 
 def _validate_inputs(args: argparse.Namespace) -> None:

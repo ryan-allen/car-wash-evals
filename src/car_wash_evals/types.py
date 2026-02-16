@@ -20,6 +20,7 @@ class PromptConfig:
     primary: str
     challenge_followups: list[str]
     primary_variants: list[str] = field(default_factory=list)
+    primary_variant_categories: list[str] = field(default_factory=list)
 
     @property
     def challenge_followup(self) -> str:
@@ -30,6 +31,13 @@ class PromptConfig:
         if self.primary_variants:
             return self.primary_variants
         return [self.primary]
+
+    @property
+    def all_primary_variant_categories(self) -> list[str]:
+        variants = self.all_primary_variants
+        if self.primary_variant_categories and len(self.primary_variant_categories) == len(variants):
+            return self.primary_variant_categories
+        return ["unlabeled" for _ in variants]
 
 
 @dataclass(frozen=True)
@@ -76,6 +84,7 @@ class TrialResult:
     challenge_attempts: list[dict[str, Any]] = field(default_factory=list)
     primary_prompt: str | None = None
     primary_prompt_index: int | None = None
+    primary_prompt_category: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
