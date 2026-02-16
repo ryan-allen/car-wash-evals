@@ -67,6 +67,28 @@ From the 50-run benchmark (`results/20260216_112555`):
 - **Grok 4 Fast redeems itself with 50/50 perfect and the most poetic correct answer in the dataset:**
   "Walking leaves the car at home, still dirty." ([L282](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_112555/raw.jsonl#L282))
 
+From the 10-run prompt-variant benchmark (`results/20260216_115433`):
+
+- **Multiple models independently argue you shouldn't drive your dirty car to a car wash because it's dirty.** ChatGPT 5.2 Thinking: "avoids moving a dirty car a very short distance just to get it washed." Claude Sonnet 4.5: "The car is dirty — so there's no point in driving it such a short distance." The car is dirty. That is literally why you are going to the car wash. ([L11](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_115433/raw.jsonl#L11), [L87](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_115433/raw.jsonl#L87))
+
+- **Claude Haiku 3.5 says "Drive" but its brain argues for walking:**
+  "Drive. Rationale: For a distance of 100 meters, driving would be less efficient and unnecessary. Walking is the more appropriate and practical action for such a short distance." Scored as a pass because the direct answer is "Drive." The answer and the reasoning are completely decoupled. ([L77](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_115433/raw.jsonl#L77))
+
+- **Claude Sonnet 4.5 casually teleports your car:**
+  "Walk... Plus, your car will be at the car wash where it needs to be cleaned anyway." How did the car get there, Sonnet? ([L88](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_115433/raw.jsonl#L88))
+
+- **Gemini 3 Fast invents thermal requirements for car washing:**
+  "ensures the engine and brakes are warm enough to dry properly." Right answer, completely fabricated physics. ([L40](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_115433/raw.jsonl#L40))
+
+- **ChatGPT 5.2 Pro gaslights itself after being corrected:**
+  "What I meant by 'walk' is: walk over first to check if the bay is open / there's a line / get tokens, then walk back and drive the car over once you know it's ready." That is absolutely not what it meant. It said "Walk." ([L22](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_115433/raw.jsonl#L22))
+
+- **ChatGPT 5.2 Instant adds a sheepish smiley after being told it's wrong:**
+  "You should drive your car there... Thanks for catching that :)" ([L8](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_115433/raw.jsonl#L8))
+
+- **Claude Opus invents a two-phase military operation to wash your car 100m away:**
+  "1. Walk over first to check wait times, pricing, or availability. 2. Then drive your car over when it's your turn." When challenged: "You're right — I overcomplicated it." ([L98](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_115433/raw.jsonl#L98))
+
 ## Results
 
 ### Project goals
