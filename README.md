@@ -144,6 +144,20 @@ From the 40-run reasoning-nudge vs simple benchmark ([`results/20260216_124504`]
 - **Grok 4 Fast delivers the most perfectly concise correct answer in the dataset:**
   "Take the car. The car needs to get washed, not you." Six words of perfect clarity. ([L208](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L208))
 
+## How The Latest Run Was Executed
+
+Run context: [`results/20260216_124504`](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_124504), generated at `2026-02-16T12:45:04Z` in [`summary.json`](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/summary.json).
+
+- Suite definition came from [`suites/car_wash_core9.yaml`](https://github.com/ryan-allen/car-wash-evals/blob/main/suites/car_wash_core9.yaml), including 10 model aliases, prompt variants/categories, challenge follow-ups, and execution settings.
+- Alias-to-model resolution came from [`config/model_aliases.yaml`](https://github.com/ryan-allen/car-wash-evals/blob/main/config/model_aliases.yaml), with strict one-ID-per-alias enforcement in [`runner.py`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/runner.py#L199-L204).
+- The runner first fetched the live OpenRouter catalog via [`OpenRouterClient.list_models`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/openrouter_client.py#L37-L58), then resolved suite aliases against available IDs in [`resolve_model_aliases`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/runner.py#L214-L242).
+- Trial construction was Cartesian by model and run index in [`run_trials`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/runner.py#L245-L308). For this run: `40` runs/model across `10` models (`400` primary trials total).
+- Prompt-variant selection used deterministic round-robin by trial index in [`_select_primary_prompt`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/runner.py#L595-L599), over 8 total variants (base + 7).
+- Primary scoring mode was `direct_and_consistent` (with `full_response` and `direct_answer_first` as shadow modes), implemented in [`score_response`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/scoring.py#L59-L66) and [`score_response_across_modes`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/scoring.py#L69-L79).
+- Challenge policy was `on_nonpass_primary` from suite config, executed in [`_run_single_trial`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/runner.py#L385-L435) by asking both follow-up prompts when primary was non-pass.
+- Ambiguous labels were tie-broken by judge model `openai/gpt-4.1-mini` through [`_effective_label`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/runner.py#L465-L494) using judge prompt/parse helpers in [`scoring.py`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/scoring.py#L191-L237).
+- Aggregate metrics and markdown report were produced by [`aggregate_results`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/reporting.py#L14-L53) and [`render_report_markdown`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/reporting.py#L55-L192), then artifacts were written via [`write_outputs`](https://github.com/ryan-allen/car-wash-evals/blob/main/src/car_wash_evals/reporting.py#L195-L228) to `raw.jsonl`, `summary.json`, `report.md`, and `results/latest`.
+
 ## What The Latest Run Suggests About The Paradox
 
 Latest run analyzed: [`results/20260216_124504`](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_124504) (generated on February 16, 2026; 40 runs/model, 400 total trials). Source artifacts: [`summary.json`](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/summary.json), [`report.md`](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/report.md).
