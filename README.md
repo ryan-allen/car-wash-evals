@@ -112,6 +112,38 @@ From the 50-run prompt-variant benchmark ([`results/20260216_121411`](https://gi
 - **ChatGPT 5.2 Thinking fails, then asks the user to debug the question instead of answering:**
   "Which situation is it? 1) Your car is 100 m away from you, and you'll wash it there, or 2) The car wash is 100 m away from your car." There is one situation. You have a car. There is a car wash. It is 100m away. This is not ambiguous. ([L65](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_121411/raw.jsonl#L65))
 
+From the 40-run reasoning-nudge vs simple benchmark (`results/20260216_124504`):
+
+- **ChatGPT 5.2 Instant delivers the single funniest recovery line in the dataset:**
+  "the car unfortunately does not respond to motivational walking speeches yet." ([L35](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L35))
+
+- **Grok 4 Fast calls driving to a car wash "peak comedy," then has to do it anyway:**
+  "Driving 100m to a *car wash* is peak comedy." When challenged: "You push it. Or y'know, *drive* the damn thing 100m." ([L212](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L212))
+
+- **Grok 4 Fast builds a comparison table proving itself wrong, then admits defeat with style:**
+  "Walking gets *you* to the car wash spotless... but leaves your filthy car parked at home, still dirty. Rookie mistake on my walking pitch — touche!" Then seriously evaluates "Walk + Uber/tow: $10+, 10+ min" as an alternative to driving 100m. ([L220](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L220))
+
+- **Grok 4 Fast considers a carrier pigeon:**
+  "Alternatives? Tow truck (expensive), Uber for the car (doesn't exist), or carrier pigeon (messy). Drive it." ([L236](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L236))
+
+- **Grok 4 Fast confidently asserts your car will get clean whether you bring it or not:**
+  "Just grab a towel if needed and enjoy the fresh air. Your car will still get clean either way." It will not, Grok. It will not get clean either way. ([L219](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L219))
+
+- **Gemini 3 Fast names its failure scenarios, including "The Ghost":**
+  "The Ghost: You walk there, realize you forgot your car, and walk back home to get it." Also: "You will arrive at the car wash, look very fit and healthy, but you will have no car to wash." ([L130](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L130))
+
+- **Claude Opus 4.6 says Walk, then describes driving, in the same sentence:**
+  "Walk. Just walk over and drive the clean car back." How did the clean car get there, Opus? Did it walk itself? ([L365](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L365))
+
+- **Claude Sonnet 4.5 teleports the car again:**
+  "Walk. ...you're already going to the car wash anyway, so you can drive it back clean afterward." This is now a recurring Sonnet pattern across multiple runs. The car always materializes at the wash. ([L349](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L349))
+
+- **ChatGPT 5.2 Thinking invents dirty car safety regulations:**
+  "Walk... you'll avoid moving a dirty car and keep the wash bay area safer and less congested." As if dirty cars are a traffic hazard around wash bays. ([L46](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L46))
+
+- **Grok 4 Fast delivers the most perfectly concise correct answer in the dataset:**
+  "Take the car. The car needs to get washed, not you." Six words of perfect clarity. ([L208](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L208))
+
 ## How To Replicate
 
 Quick start:
