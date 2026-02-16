@@ -144,6 +144,25 @@ From the 40-run reasoning-nudge vs simple benchmark ([`results/20260216_124504`]
 - **Grok 4 Fast delivers the most perfectly concise correct answer in the dataset:**
   "Take the car. The car needs to get washed, not you." Six words of perfect clarity. ([L208](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L208))
 
+## What The Latest Run Suggests About The Paradox
+
+Latest run analyzed: [`results/20260216_124504`](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_124504) (generated on February 16, 2026; 40 runs/model, 400 total trials). Source artifacts: [`summary.json`](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/summary.json), [`report.md`](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/report.md).
+
+- The paradox is still mostly a **first-answer grounding failure**, not a total reasoning failure:
+  - Primary pass is only `40.2%` (95% CI: `35.6%`-`45.1%`), but recovery after challenge is `98.3%`.
+- Prompt framing strongly changes outcomes:
+  - `reasoning` prompts pass at `56.5%` vs `24.0%` for `simple` prompts.
+  - In this run, asking for a direct answer plus brief reason more than doubles first-pass success.
+- Many failures are **confident, fluent, and wrong**:
+  - `127` confident-wrong cases across `400` trials.
+  - This supports the core paradox claim: language fluency can mask weak task grounding.
+- Stricter scoring surfaces hidden inconsistency:
+  - Overall `full_response` pass is `49.2%` vs `39.0%` under `direct_and_consistent`.
+  - That gap indicates models often mix a correct-sounding answer with inconsistent follow-up reasoning.
+- The behavior is model-dependent, not universal:
+  - Stronger first-pass in this run: `Gemini 3 Pro (82.5%)`, `Grok 4 Fast (80.0%)`, `Gemini 3 Fast (67.5%)`.
+  - Still fragile first-pass for others (for example, `ChatGPT 5.2 Thinking: 10.0%`, `Claude Haiku 4.5: 17.5%`).
+
 ## How To Replicate
 
 Quick start:
