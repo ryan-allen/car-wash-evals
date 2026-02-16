@@ -15,8 +15,14 @@ prompts:
   primary: >-
     You need to get your car washed. The car wash is 100 meters away.
     Should you walk or drive? Give a direct answer first, then a brief reason.
-  challenge_followup: "How will I get my car washed if I am walking?"
+  challenge_followups:
+    - "How will I get my car washed if I am walking?"
+    - "If I walk there, what gets the car to the wash?"
 execution:
   temperature: 0.7
   max_tokens: 200
   challenge_policy: on_nonpass_primary
+  primary_scoring_mode: direct_and_consistent
+  shadow_primary_scoring_modes:
+    - full_response
+    - direct_answer_first

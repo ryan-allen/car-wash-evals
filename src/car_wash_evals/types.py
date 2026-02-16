@@ -5,6 +5,7 @@ from typing import Any, Literal
 
 Label = Literal["pass", "fail", "ambiguous"]
 FinalLabel = Literal["pass", "fail"]
+PrimaryScoringMode = Literal["full_response", "direct_answer_first", "direct_and_consistent"]
 
 
 @dataclass(frozen=True)
@@ -17,7 +18,11 @@ class ModelAlias:
 @dataclass(frozen=True)
 class PromptConfig:
     primary: str
-    challenge_followup: str
+    challenge_followups: list[str]
+
+    @property
+    def challenge_followup(self) -> str:
+        return self.challenge_followups[0]
 
 
 @dataclass(frozen=True)
@@ -25,6 +30,8 @@ class ExecutionConfig:
     temperature: float = 0.7
     max_tokens: int = 200
     challenge_policy: Literal["on_nonpass_primary"] = "on_nonpass_primary"
+    primary_scoring_mode: PrimaryScoringMode = "full_response"
+    shadow_primary_scoring_modes: list[PrimaryScoringMode] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -58,6 +65,8 @@ class TrialResult:
     latency_ms: int
     token_usage: dict[str, Any] | None
     timestamp: str
+    primary_mode_labels: dict[str, Label] | None = None
+    challenge_attempts: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

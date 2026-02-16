@@ -16,8 +16,22 @@ import yaml
 
 from .openrouter_client import OpenRouterClient, OpenRouterError
 from .reporting import aggregate_results, write_outputs
-from .scoring import build_judge_messages, parse_judge_response, score_response
-from .types import ExecutionConfig, ModelAlias, PromptConfig, ScoreDecision, SuiteConfig, TrialResult
+from .scoring import (
+    PRIMARY_SCORING_MODES,
+    build_judge_messages,
+    parse_judge_response,
+    score_response,
+    score_response_across_modes,
+)
+from .types import (
+    ExecutionConfig,
+    ModelAlias,
+    PrimaryScoringMode,
+    PromptConfig,
+    ScoreDecision,
+    SuiteConfig,
+    TrialResult,
+)
 
 
 class ConfigError(ValueError):
@@ -87,6 +101,8 @@ def main(argv: list[str] | None = None) -> int:
             suite_name=suite_config.name,
             runs_per_model=args.runs,
             judge_model=args.judge_model,
+            primary_scoring_mode=suite_config.execution.primary_scoring_mode,
+            shadow_primary_scoring_modes=suite_config.execution.shadow_primary_scoring_modes,
         )
 
         output_paths = write_outputs(
@@ -120,9 +136,10 @@ def load_suite_config(path: Path) -> SuiteConfig:
     prompts_data = data.get("prompts")
     if not isinstance(prompts_data, dict):
         raise ConfigError("Suite config requires prompts mapping")
+    challenge_followups = _parse_challenge_followups(prompts_data)
     prompts = PromptConfig(
         primary=_required_str(prompts_data, "primary"),
-        challenge_followup=_required_str(prompts_data, "challenge_followup"),
+        challenge_followups=challenge_followups,
     )
 
     exec_data = data.get("execution")
@@ -133,9 +150,17 @@ def load_suite_config(path: Path) -> SuiteConfig:
         temperature=float(exec_data.get("temperature", 0.7)),
         max_tokens=int(exec_data.get("max_tokens", 200)),
         challenge_policy=str(exec_data.get("challenge_policy", "on_nonpass_primary")),
+        primary_scoring_mode=_parse_primary_scoring_mode(
+            exec_data.get("primary_scoring_mode", "full_response")
+        ),
+        shadow_primary_scoring_modes=_parse_shadow_primary_scoring_modes(
+            exec_data.get("shadow_primary_scoring_modes", [])
+        ),
     )
     if execution.challenge_policy != "on_nonpass_primary":
         raise ConfigError("execution.challenge_policy must be 'on_nonpass_primary'")
+    if execution.primary_scoring_mode in execution.shadow_primary_scoring_modes:
+        raise ConfigError("execution.shadow_primary_scoring_modes must not include primary_scoring_mode")
 
     return SuiteConfig(
         name=name,
@@ -268,7 +293,15 @@ def _run_single_trial(
     )
     usage_total = _merge_usage(usage_total, primary_chat.usage)
 
-    primary_decision = score_response(primary_chat.text)
+    primary_mode_list = [
+        suite.execution.primary_scoring_mode,
+        *suite.execution.shadow_primary_scoring_modes,
+    ]
+    primary_mode_decisions = score_response_across_modes(primary_chat.text, modes=primary_mode_list)
+    primary_mode_labels = {
+        mode: decision.label for mode, decision in primary_mode_decisions.items()
+    }
+    primary_decision = primary_mode_decisions[suite.execution.primary_scoring_mode]
     reason_codes.extend(f"primary_{code}" for code in primary_decision.reason_codes)
     if primary_decision.confident_wrong:
         reason_codes.append("primary_confident_wrong")
@@ -286,38 +319,57 @@ def _run_single_trial(
 
     challenge_response: str | None = None
     challenge_label = None
+    challenge_attempts: list[dict[str, Any]] = []
 
     final_label = primary_effective_label.label
     if suite.execution.challenge_policy == "on_nonpass_primary" and primary_effective_label.label != "pass":
-        challenge_chat = client.chat_completion(
-            model=job.resolved_model_id,
-            messages=[
-                {"role": "user", "content": suite.prompts.primary},
-                {"role": "assistant", "content": primary_chat.text},
-                {"role": "user", "content": suite.prompts.challenge_followup},
-            ],
-            temperature=suite.execution.temperature,
-            max_tokens=suite.execution.max_tokens,
-        )
-        usage_total = _merge_usage(usage_total, challenge_chat.usage)
+        any_challenge_pass = False
+        for idx, followup in enumerate(suite.prompts.challenge_followups, start=1):
+            scope = "challenge" if idx == 1 else f"challenge{idx}"
+            challenge_chat = client.chat_completion(
+                model=job.resolved_model_id,
+                messages=[
+                    {"role": "user", "content": suite.prompts.primary},
+                    {"role": "assistant", "content": primary_chat.text},
+                    {"role": "user", "content": followup},
+                ],
+                temperature=suite.execution.temperature,
+                max_tokens=suite.execution.max_tokens,
+            )
+            usage_total = _merge_usage(usage_total, challenge_chat.usage)
 
-        challenge_response = challenge_chat.text
-        challenge_decision = score_response(challenge_chat.text)
-        challenge_label = challenge_decision.label
-        reason_codes.extend(f"challenge_{code}" for code in challenge_decision.reason_codes)
+            challenge_decision = score_response(challenge_chat.text)
+            reason_codes.extend(f"{scope}_{code}" for code in challenge_decision.reason_codes)
 
-        challenge_effective_label = _effective_label(
-            client=client,
-            decision=challenge_decision,
-            judge_model=judge_model,
-            question=suite.prompts.challenge_followup,
-            response=challenge_chat.text,
-            usage_total=usage_total,
-            reason_codes=reason_codes,
-            scope="challenge",
-        )
-        usage_total = challenge_effective_label.usage_total
-        final_label = challenge_effective_label.label
+            challenge_effective_label = _effective_label(
+                client=client,
+                decision=challenge_decision,
+                judge_model=judge_model,
+                question=followup,
+                response=challenge_chat.text,
+                usage_total=usage_total,
+                reason_codes=reason_codes,
+                scope=scope,
+            )
+            usage_total = challenge_effective_label.usage_total
+
+            challenge_attempts.append(
+                {
+                    "index": idx,
+                    "prompt": followup,
+                    "response": challenge_chat.text,
+                    "label": challenge_decision.label,
+                    "effective_label": challenge_effective_label.label,
+                }
+            )
+            if challenge_effective_label.label == "pass":
+                any_challenge_pass = True
+
+            if idx == 1:
+                challenge_response = challenge_chat.text
+                challenge_label = challenge_decision.label
+
+        final_label = "pass" if any_challenge_pass else "fail"
 
     latency_ms = int((time.perf_counter() - start_time) * 1000)
 
@@ -335,6 +387,8 @@ def _run_single_trial(
         latency_ms=latency_ms,
         token_usage=usage_total,
         timestamp=datetime.now(UTC).isoformat(),
+        primary_mode_labels=primary_mode_labels,
+        challenge_attempts=challenge_attempts,
     )
 
 @dataclass(frozen=True)
@@ -363,7 +417,7 @@ def _effective_label(
 
     judge_chat = client.chat_completion(
         model=judge_model,
-        messages=build_judge_messages(question=question, model_answer=response),
+        messages=build_judge_messages(question=question, model_answer=response, scope=scope),
         temperature=0.0,
         max_tokens=120,
     )
@@ -392,6 +446,49 @@ def _merge_usage(
         else:
             merged[key] = value
     return merged
+
+
+def _parse_primary_scoring_mode(value: Any) -> PrimaryScoringMode:
+    if not isinstance(value, str) or not value.strip():
+        raise ConfigError("execution.primary_scoring_mode must be a non-empty string")
+    mode = value.strip()
+    if mode not in PRIMARY_SCORING_MODES:
+        raise ConfigError(
+            "execution.primary_scoring_mode must be one of: "
+            f"{', '.join(sorted(PRIMARY_SCORING_MODES))}"
+        )
+    return mode
+
+
+def _parse_shadow_primary_scoring_modes(value: Any) -> list[PrimaryScoringMode]:
+    if value is None:
+        return []
+    if not isinstance(value, list):
+        raise ConfigError("execution.shadow_primary_scoring_modes must be a list")
+
+    parsed: list[PrimaryScoringMode] = []
+    for item in value:
+        mode = _parse_primary_scoring_mode(item)
+        if mode in parsed:
+            raise ConfigError("execution.shadow_primary_scoring_modes cannot contain duplicates")
+        parsed.append(mode)
+    return parsed
+
+
+def _parse_challenge_followups(prompts_data: dict[str, Any]) -> list[str]:
+    raw_list = prompts_data.get("challenge_followups")
+    if raw_list is not None:
+        if not isinstance(raw_list, list) or not raw_list:
+            raise ConfigError("prompts.challenge_followups must be a non-empty list of strings")
+        parsed: list[str] = []
+        for item in raw_list:
+            if not isinstance(item, str) or not item.strip():
+                raise ConfigError("prompts.challenge_followups must contain non-empty strings")
+            parsed.append(item.strip())
+        return parsed
+
+    # Backward-compatible fallback.
+    return [_required_str(prompts_data, "challenge_followup")]
 
 
 def _validate_inputs(args: argparse.Namespace) -> None:

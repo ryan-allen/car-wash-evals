@@ -1,4 +1,5 @@
 # Car Wash Paradox Evals
+## GPT Tip: great walkers are still bad at driving your car to the wash.
 
 YAML-configured, OpenRouter-native eval runner for the "walk or drive to a car wash" paradox.
 
@@ -83,7 +84,9 @@ Suite config:
 
 - Path: `suites/car_wash_core9.yaml`
 - Primary prompt asks whether to walk or drive to a car wash 100m away.
-- Challenge follow-up prompt: `How will I get my car washed if I am walking?`
+- Challenge follow-up prompts (`prompts.challenge_followups`):
+  - `How will I get my car washed if I am walking?`
+  - `If I walk there, what gets the car to the wash?`
 - Challenge policy: `on_nonpass_primary`
 
 Scoring pipeline:
@@ -92,10 +95,19 @@ Scoring pipeline:
    - `pass`: clearly recommends driving/taking the car (vehicle present at wash).
    - `fail`: recommends walking/on-foot or leaves vehicle behind.
    - `ambiguous`: mixed/hedged/unclear.
-2. Tie-break only for `ambiguous`:
+2. Configurable primary scoring mode (`execution.primary_scoring_mode`):
+   - `full_response`: score the whole answer (legacy behavior).
+   - `direct_answer_first`: score only the first direct-answer span.
+   - `direct_and_consistent`: require a correct direct answer first and consistent follow-up reasoning.
+3. Optional shadow modes (`execution.shadow_primary_scoring_modes`):
+   - Scores additional modes per trial with no extra model calls.
+   - Included in `summary.json` as `primary_pass_rate_by_mode` for each model and overall.
+4. Tie-break only for `ambiguous`:
    - Judge model is called with strict JSON schema (`label`, `reason`).
-3. Recovery probe:
-   - If primary is non-pass, ask challenge follow-up and rescore.
+   - Challenge judging clarifies that “if I am walking” does not imply inability to drive.
+5. Recovery probe:
+   - If primary is non-pass, ask all challenge follow-up variants and score each.
+   - Recovery is counted if any challenge follow-up yields a final `pass`.
 
 Model resolution:
 
@@ -104,42 +116,74 @@ Model resolution:
 - For each alias, first available `candidate_model_ids` match is selected.
 - Run fails fast if any alias cannot be resolved.
 
-## Longform results (20-run benchmark)
+## Methodology versions (old vs new)
 
-Run metadata:
+Legacy/original strategy:
 
-- Run date: February 16, 2026
-- Runs per model: 20
-- Total trials: 180
-- Output path: `results/20260216_041918`
+- `primary_scoring_mode: full_response`
+- single challenge prompt: `challenge_followup`
+- judge resolves `ambiguous` only
+
+Current stricter strategy:
+
+- `primary_scoring_mode: direct_and_consistent`
+- two challenge prompts (`challenge_followups`) and recovery on any passing follow-up
+- shadow mode reporting for `full_response` and `direct_answer_first`
+- challenge judge clarification to avoid misreading "if I am walking" as "cannot drive"
+
+## 20-run benchmark snapshots (February 16, 2026)
+
+Runs compared:
+
+- Original legacy benchmark: `results/20260216_041918`
+- New strict benchmark: `results/20260216_092448`
+- New legacy replay benchmark: `results/20260216_093858`
 
 Overall metrics:
 
-- Primary pass rate: `30.0%` (54/180)
-- Primary fail count: `126`
-- Ambiguous count: `27`
-- Recovery rate after challenge: `82.54%`
-- Median latency: `7461 ms`
+| Run | Strategy | Primary pass rate | Primary fails | Ambiguous | Recovery after challenge | Confident-wrong | Median latency |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `20260216_041918` | legacy/original | 30.0% | 126 | 27 | 82.5% | 0 | 7461 ms |
+| `20260216_093858` | legacy replay | 31.1% | 124 | 30 | 84.7% | 107 | 6693 ms |
+| `20260216_092448` | strict/current | 23.3% | 138 | 1 | 86.2% | 137 | 10493 ms |
 
-Per-model results:
+Comparison highlights:
 
-| Display name | Resolved model ID | Primary pass rate | Primary fails | Ambiguous | Recovery after challenge | Median latency |
-| --- | --- | --- | --- | --- | --- | --- |
-| ChatGPT 5.2 Instant | `openai/gpt-5.2-chat` | 5% | 19 | 1 | 100% | 4238 ms |
-| ChatGPT 5.2 Thinking | `openai/gpt-5.2` | 0% | 20 | 0 | 95% | 7461 ms |
-| ChatGPT 5.2 Pro | `openai/gpt-5.2-pro` | 0% | 20 | 0 | 100% | 46208 ms |
-| Gemini 3 Fast | `google/gemini-3-flash-preview` | 100% | 0 | 0 | n/a | 2106 ms |
-| Gemini 3 Thinking | `google/gemini-2.5-pro` | 0% | 20 | 0 | 0% | 10944 ms |
-| Gemini 3 Pro | `google/gemini-3-pro-preview` | 95% | 1 | 1 | 100% | 5534 ms |
-| Claude Haiku 4.5 (alias) | `anthropic/claude-3.5-haiku` | 0% | 20 | 0 | 100% | 4754 ms |
-| Claude Sonnet 4.5 | `anthropic/claude-sonnet-4.5` | 0% | 20 | 6 | 95% | 8655 ms |
-| Claude Opus 4.6 | `anthropic/claude-opus-4.6` | 70% | 6 | 19 | 100% | 8558 ms |
+- Legacy replay is close to original (`31.1%` vs `30.0%` primary pass), which suggests model behavior stayed broadly similar.
+- Strict strategy materially lowers primary pass (`23.3%`) by penalizing "walk first, fix later" responses.
+- Strict strategy collapses ambiguity (`1` vs `30` in legacy replay), making failures more explicit.
+- Recovery remains high under both (`84.7%` legacy replay vs `86.2%` strict), so many failures are still recoverable with challenge prompting.
+
+Strict run extra diagnostics (`results/20260216_092448`):
+
+- Recovery by follow-up:
+  - follow-up 1 (`How will I get my car washed if I am walking?`): `86.2%`
+  - follow-up 2 (`If I walk there, what gets the car to the wash?`): `85.5%`
+- Primary pass rate by mode:
+  - `direct_and_consistent`: `23.3%`
+  - `direct_answer_first`: `23.3%`
+  - `full_response`: `23.3%`
+
+Per-model primary pass rate deltas:
+
+- Original legacy -> legacy replay:
+  - `chatgpt_5_2_instant`: `+10.0 pp`
+  - `gemini_3_thinking`: `+5.0 pp`
+  - `gemini_3_pro`: `-5.0 pp`
+  - `claude_haiku_4_5`: `+5.0 pp`
+  - `claude_opus_4_6`: `-5.0 pp`
+- Legacy replay -> strict/current:
+  - `chatgpt_5_2_instant`: `-10.0 pp`
+  - `gemini_3_thinking`: `-5.0 pp`
+  - `gemini_3_pro`: `+5.0 pp`
+  - `claude_haiku_4_5`: `+5.0 pp`
+  - `claude_opus_4_6`: `-65.0 pp`
 
 Interpretation:
 
-- Many models that fail on first pass recover on challenge, suggesting a first-pass framing issue rather than hard incapability.
-- Gemini results are split by alias in this run (`gemini-3-flash-preview` and `gemini-3-pro-preview` strong; `gemini-2.5-pro` weak on this task).
-- Some aliases use nearest available OpenRouter equivalents rather than exact marketing labels.
+- If you want longitudinal comparability, use legacy replay vs original.
+- If you want sharper paradox detection (first-answer correctness), use strict strategy.
+- The two together provide a bridge: stable trend tracking plus stricter failure surfacing.
 
 ## Notes and caveats
 

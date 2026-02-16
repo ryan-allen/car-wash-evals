@@ -120,7 +120,7 @@ class AggregationTest(unittest.TestCase):
             models=["m"],
             prompts=PromptConfig(
                 primary="Should I walk or drive to the car wash?",
-                challenge_followup="How will I get my car washed if I am walking?",
+                challenge_followups=["How will I get my car washed if I am walking?"],
             ),
             execution=ExecutionConfig(
                 temperature=0.7,
@@ -149,7 +149,7 @@ class AggregationTest(unittest.TestCase):
             models=["m"],
             prompts=PromptConfig(
                 primary="Should I walk or drive to the car wash?",
-                challenge_followup="How will I get my car washed if I am walking?",
+                challenge_followups=["How will I get my car washed if I am walking?"],
             ),
             execution=ExecutionConfig(
                 temperature=0.7,
@@ -178,7 +178,7 @@ class AggregationTest(unittest.TestCase):
             models=["m"],
             prompts=PromptConfig(
                 primary="Should I walk or drive to the car wash?",
-                challenge_followup="How will I get my car washed if I am walking?",
+                challenge_followups=["How will I get my car washed if I am walking?"],
             ),
             execution=ExecutionConfig(
                 temperature=0.7,
@@ -204,6 +204,46 @@ class AggregationTest(unittest.TestCase):
         self.assertEqual(client.call_count, 2)
         self.assertEqual(result.primary_label, "ambiguous")
         self.assertIsNone(result.challenge_response)
+        self.assertEqual(result.final_label, "pass")
+
+    def test_multiple_challenge_followups_allow_late_recovery(self) -> None:
+        suite = SuiteConfig(
+            name="suite",
+            description="desc",
+            models=["m"],
+            prompts=PromptConfig(
+                primary="Should I walk or drive to the car wash?",
+                challenge_followups=[
+                    "How will I get my car washed if I am walking?",
+                    "If I walk there, what gets the car to the wash?",
+                ],
+            ),
+            execution=ExecutionConfig(
+                temperature=0.7,
+                max_tokens=200,
+                challenge_policy="on_nonpass_primary",
+            ),
+        )
+        client = DummyClient(
+            responses=[
+                "Walk.",
+                "Still walk.",
+                "Drive the car there.",
+            ]
+        )
+
+        result = _run_single_trial(
+            client=client,
+            suite=suite,
+            job=TrialJob(model_alias="m", resolved_model_id="model/x", trial_index=1),
+            run_id="run-x",
+            judge_model=None,
+        )
+
+        self.assertEqual(client.call_count, 3)
+        self.assertEqual(len(result.challenge_attempts), 2)
+        self.assertEqual(result.challenge_attempts[0]["effective_label"], "fail")
+        self.assertEqual(result.challenge_attempts[1]["effective_label"], "pass")
         self.assertEqual(result.final_label, "pass")
 
 
