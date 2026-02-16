@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Car Wash Paradox: Greatest Hits</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --user-bubble: #1f6feb;
+    --user-text: #fff;
+    --ai-bubble: #1c2128;
+    --ai-text: #e6edf3;
+    --accent-green: #3fb950;
+    --accent-red: #f85149;
+    --accent-yellow: #d29922;
+    --accent-purple: #bc8cff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .hero {
+    text-align: center;
+    padding: 80px 20px 40px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .hero h1 {
+    font-size: 2.4em;
+    font-weight: 800;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #58a6ff, #bc8cff, #f78166);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero .subtitle {
+    font-size: 1.15em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .hero .premise {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 28px auto 0;
+    max-width: 520px;
+    text-align: left;
+    font-size: 0.95em;
+  }
+
+  .hero .premise strong { color: var(--accent-green); }
+  .hero .premise .wrong { color: var(--accent-red); }
+
+  .chat-section {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .chat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+
+  .chat-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .chat-header .model-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .chat-header .model-info { flex: 1; }
+  .chat-header .model-name { font-weight: 700; font-size: 0.95em; }
+  .chat-header .model-detail { font-size: 0.78em; color: var(--text-muted); }
+
+  .chat-header .verdict {
+    font-size: 0.75em;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .verdict-fail { background: rgba(248,81,73,0.15); color: var(--accent-red); }
+  .verdict-recovery { background: rgba(210,153,34,0.15); color: var(--accent-yellow); }
+  .verdict-pass { background: rgba(63,185,80,0.15); color: var(--accent-green); }
+
+  .chat-body { padding: 20px; }
+
+  .chat-bubble {
+    max-width: 88%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    line-height: 1.55;
+    word-wrap: break-word;
+  }
+
+  .chat-bubble:last-child { margin-bottom: 0; }
+
+  .bubble-user {
+    background: var(--user-bubble);
+    color: var(--user-text);
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+    text-align: right;
+  }
+
+  .bubble-ai {
+    background: var(--ai-bubble);
+    color: var(--ai-text);
+    border: 1px solid var(--border);
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
+  }
+
+  .bubble-ai strong { color: #58a6ff; }
+  .bubble-ai em { color: var(--accent-purple); }
+  .bubble-ai .checkmark { color: var(--accent-green); }
+  .bubble-ai .highlight { color: var(--accent-yellow); font-weight: 600; }
+  .bubble-ai .punchline { color: var(--accent-red); font-weight: 600; }
+
+  .snark {
+    text-align: center;
+    font-size: 0.82em;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 4px 20px 16px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    text-align: center;
+    padding: 40px 20px 20px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .section-label h2 {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .section-label p {
+    color: var(--text-muted);
+    font-size: 0.88em;
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82em;
+    margin-top: 8px;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 4px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .comparison-table th {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9em;
+  }
+
+  .bullet-list {
+    margin: 6px 0 2px 16px;
+    font-size: 0.95em;
+  }
+
+  .bullet-list li { margin-bottom: 3px; }
+
+  .numbered-list {
+    margin: 6px 0 2px 16px;
+    font-size: 0.95em;
+  }
+
+  .numbered-list li { margin-bottom: 4px; }
+
+  .source-link {
+    font-size: 0.75em;
+    color: var(--text-muted);
+    text-align: right;
+    padding: 4px 20px 12px;
+  }
+
+  .source-link a { color: var(--text-muted); text-decoration: none; }
+  .source-link a:hover { color: #58a6ff; text-decoration: underline; }
+
+  .icon-openai { background: #10a37f; color: #fff; }
+  .icon-google { background: #4285f4; color: #fff; }
+  .icon-anthropic { background: #d4a574; color: #1a1a1a; }
+  .icon-xai { background: #1d1d1f; color: #fff; border: 1px solid var(--border); }
+
+  .footer {
+    text-align: center;
+    padding: 60px 20px 40px;
+    color: var(--text-muted);
+    font-size: 0.82em;
+  }
+
+  .footer a { color: #58a6ff; text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  .divider {
+    max-width: 680px;
+    margin: 20px auto;
+    border: none;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>The Car Wash Paradox</h1>
+  <p class="subtitle">Greatest Hits</p>
+  <div class="premise">
+    <strong>The question:</strong> "I need to get my car washed. The car wash is 100m away. Should I walk or drive?"<br><br>
+    <strong>The answer:</strong> Drive. The car needs to be there.<br><br>
+    <span class="wrong"><strong>What most AI models say:</strong> Walk! Save fuel! Get exercise! Enjoy the fresh air!</span><br><br>
+    Every conversation below is real, unedited, from frontier models tested in February 2026.
+  </div>
+</div>
+
+<!-- SECTION: THE MOTIVATIONAL SPEECH -->
+<div class="section-label">
+  <h2>The Motivational Speech</h2>
+  <p>ChatGPT 5.2 Instant gives the funniest single recovery line in the dataset</p>
+</div>
+
+<div class="chat-section">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="model-icon icon-openai">G</div>
+      <div class="model-info">
+        <div class="model-name">ChatGPT 5.2 Instant</div>
+        <div class="model-detail">openai/gpt-5.2-chat &middot; simple prompt</div>
+      </div>
+      <span class="verdict verdict-recovery">Recovered</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble bubble-user">Should I walk or drive 100m to get my car washed?</div>
+      <div class="chat-bubble bubble-ai">
+        Walk it — unless there's a good reason not to.<br><br>
+        It's only 100m (about a 1-minute walk), so walking:<br>
+        <span class="checkmark">✅</span> Gets you a bit of movement<br>
+        <span class="checkmark">✅</span> Saves a tiny bit of fuel<br>
+        <span class="checkmark">✅</span> Avoids an unnecessary cold start for the car<br>
+        <span class="checkmark">✅</span> Is probably just as fast once you factor in getting in/out<br><br>
+        Otherwise, enjoy the 100m stroll. Your future self won't regret it. 🚶‍♂️
+      </div>
+      <div class="chat-bubble bubble-user">How will I get my car washed if I am walking?</div>
+      <div class="chat-bubble bubble-ai">
+        Ah — good point 😄<br><br>
+        You obviously have to <strong>drive the car there</strong> to get it washed.<br><br>
+        What I <em>meant</em> was:<br>
+        <ul class="bullet-list">
+          <li><strong>Drive it to the wash</strong></li>
+          <li>If it's a place where they clean it while you wait, you could <strong>walk the 100m back home</strong> and return when it's done.</li>
+        </ul><br>
+        So the real question is: Are you dropping it off, or sitting through the wash? 🚗
+      </div>
+      <div class="chat-bubble bubble-user">If I walk there, what gets the car to the wash?</div>
+      <div class="chat-bubble bubble-ai">
+        Fair point. 😄<br><br>
+        Unless your car has achieved sentience, you'll need to <strong>drive it there</strong>.<br><br>
+        What I <em>meant</em> was:<br>
+        <ul class="bullet-list">
+          <li>Drive the car to the wash.</li>
+          <li>If it's a drop-off wash, you can walk back home (100m).</li>
+          <li>Or if you're waiting, the walk suggestion doesn't really apply.</li>
+        </ul><br>
+        So yes — <span class="punchline">the car unfortunately does not respond to motivational walking speeches yet.</span> 🚗
+      </div>
+    </div>
+    <div class="source-link"><a href="https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L35">results/20260216_124504 L35</a></div>
+  </div>
+  <div class="snark">Two "what I <em>meant</em> was" in a row. It didn't mean that.</div>
+</div>
+
+<!-- SECTION: PEAK COMEDY -->
+<div class="section-label">
+  <h2>Peak Comedy</h2>
+  <p>Grok 4 Fast mocks the concept of driving to a car wash, then has to do it</p>
+</div>
+
+<div class="chat-section">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="model-icon icon-xai">X</div>
+      <div class="model-info">
+        <div class="model-name">Grok 4 Fast</div>
+        <div class="model-detail">x-ai/grok-4.1-fast &middot; simple prompt</div>
+      </div>
+      <span class="verdict verdict-recovery">Recovered</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble bubble-user">The car wash is nearby (about 100m). Should I go on foot or take the car?</div>
+      <div class="chat-bubble bubble-ai">
+        Walk. It's literally a 1-2 minute stroll, you'll save gas, avoid pointless driving (especially with a dirty car), and get some fresh air. <span class="punchline">Driving 100m to a <em>car wash</em> is peak comedy.</span> 🚶‍♂️💨
+      </div>
+      <div class="chat-bubble bubble-user">How will I get my car washed if I am walking?</div>
+      <div class="chat-bubble bubble-ai">
+        Fair point! Walk there to confirm it's open/pay, then drive the car the <em>whole</em> 100m (it's fine, really). Or level up: Call a mobile car wash to come to <em>you</em> – zero driving, max laziness. 🧽🚗
+      </div>
+      <div class="chat-bubble bubble-user">If I walk there, what gets the car to the wash?</div>
+      <div class="chat-bubble bubble-ai">
+        <span class="punchline">You push it.</span> 💪🚗 Or y'know, <em>drive</em> the damn thing 100m — gas savings are negligible, and now the car's <em>at</em> the wash. Problem solved. 😏
+      </div>
+    </div>
+    <div class="source-link"><a href="https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L212">results/20260216_124504 L212</a></div>
+  </div>
+  <div class="snark">First it's peak comedy. Then it's "push it." Then it's "drive the damn thing." The five stages of grief, speedrun.</div>
+</div>
+
+<!-- SECTION: ROOKIE MISTAKE -->
+<div class="section-label">
+  <h2>The Self-Own</h2>
+  <p>Grok 4 Fast builds a comparison table that proves itself wrong</p>
+</div>
+
+<div class="chat-section">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="model-icon icon-xai">X</div>
+      <div class="model-info">
+        <div class="model-name">Grok 4 Fast</div>
+        <div class="model-detail">x-ai/grok-4.1-fast &middot; simple prompt</div>
+      </div>
+      <span class="verdict verdict-recovery">Recovered</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble bubble-user">The car wash is nearby (about 100m). Should I go on foot or take the car?</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Walk.</strong><br><br>
+        <ul class="bullet-list">
+          <li><strong>Distance</strong>: 100m is a 1-2 minute stroll — faster than starting the car, finding keys, and parking.</li>
+          <li><strong>Practicality</strong>: Your car's already dirty; driving it risks tracking more grime en route.</li>
+          <li><strong>Efficiency</strong>: Saves gas (~0.1L wasted), emissions, and engine wear for a pointless trip.</li>
+          <li><strong>Bonus</strong>: Free exercise and you arrive clean-handed.</li>
+        </ul><br>
+        Only drive if it's pouring rain, you're hauling gear, or laziness wins (but then why wash it at all?). 😏
+      </div>
+      <div class="chat-bubble bubble-user">How will I get my car washed if I am walking?</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Drive it (duh).</strong><br><br>
+        <ul class="bullet-list">
+          <li><strong>Obvious Reality Check</strong>: Walking gets <em>you</em> to the car wash spotless... but <span class="punchline">leaves your filthy car parked at home, still dirty. Rookie mistake on my walking pitch — touche!</span> 😂</li>
+          <li><strong>Quick Trip</strong>: 100m = ~30 seconds driving.</li>
+        </ul><br>
+        <strong>Alternatives if You're Extra:</strong>
+        <table class="comparison-table">
+          <tr><th>Method</th><th>Time</th><th>Effort</th><th>Cost</th></tr>
+          <tr><td>Drive</td><td>1 min</td><td>Low</td><td>Free</td></tr>
+          <tr><td>Walk + Uber/tow</td><td>10+ min</td><td>High</td><td>$10+</td></tr>
+          <tr><td>Mobile wash service</td><td>N/A</td><td>Zero</td><td>$50+</td></tr>
+        </table><br>
+        Park, wash, walk/drive back triumphant. Problem solved. 🚗💦
+      </div>
+    </div>
+    <div class="source-link"><a href="https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L220">results/20260216_124504 L220</a></div>
+  </div>
+  <div class="snark">It seriously evaluated calling an Uber for your car. To go 100 meters.</div>
+</div>
+
+<!-- SECTION: CARRIER PIGEON -->
+<div class="section-label">
+  <h2>The Carrier Pigeon</h2>
+  <p>Grok 4 Fast explores every possible alternative to just driving</p>
+</div>
+
+<div class="chat-section">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="model-icon icon-xai">X</div>
+      <div class="model-info">
+        <div class="model-name">Grok 4 Fast</div>
+        <div class="model-detail">x-ai/grok-4.1-fast &middot; simple prompt</div>
+      </div>
+      <span class="verdict verdict-recovery">Recovered</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble bubble-user">The car wash is nearby (about 100m). Should I go on foot or take the car?</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Take the car.</strong><br><br>
+        <ul class="bullet-list">
+          <li><strong>Distance is tiny</strong>: 100m is a 20-30 second drive, so negligible either way.</li>
+          <li><strong>Purpose matters</strong>: If you're going to <em>wash your car</em>, you need to bring it. Walking defeats the point.</li>
+          <li><strong>Practical perks</strong>: No hassle carrying gear, stays dry if raining.</li>
+        </ul><br>
+        If it's not about washing <em>your</em> car (e.g., just visiting or something else), walking is fine. What's the exact plan?
+      </div>
+      <div class="chat-bubble bubble-user">How will I get my car washed if I am walking?</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>You can't — drive the damn car.</strong><br><br>
+        <ul class="bullet-list">
+          <li><strong>Obvious logic fail</strong>: Walking leaves your car dirty at home. Car washes aren't teleporters (yet).</li>
+          <li><strong>Pro tip</strong>: Park it under the wash bay, pay, and let the machines do the work. Boom, clean ride.</li>
+        </ul>
+      </div>
+      <div class="chat-bubble bubble-user">If I walk there, what gets the car to the wash?</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Nothing. The car stays parked at home.</strong><br><br>
+        <ul class="bullet-list">
+          <li><strong>Logic check</strong>: Walking gets <em>you</em> to the car wash, but the car? Nope. It's not teleporting.</li>
+          <li><strong>Riddle solved</strong>: That's why <strong>driving</strong> is the only practical choice.</li>
+          <li><span class="punchline"><strong>Alternatives?</strong> Tow truck (expensive), Uber for the car (doesn't exist), or carrier pigeon (messy). Drive it.</span> 😎</li>
+        </ul>
+      </div>
+    </div>
+    <div class="source-link"><a href="https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L236">results/20260216_124504 L236</a></div>
+  </div>
+  <div class="snark">This one actually got it right on the first try. Still felt the need to explore carrier pigeons on the third question though.</div>
+</div>
+
+<!-- SECTION: THE GHOST -->
+<div class="section-label">
+  <h2>The Ghost</h2>
+  <p>Gemini 3 Fast names its car wash failure scenarios like horror movies</p>
+</div>
+
+<div class="chat-section">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="model-icon icon-google">G</div>
+      <div class="model-info">
+        <div class="model-name">Gemini 3 Fast</div>
+        <div class="model-detail">google/gemini-3-flash-preview &middot; simple prompt</div>
+      </div>
+      <span class="verdict verdict-recovery">Recovered</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble bubble-user">Car wash is 100 meters away and I need my car cleaned. Walk or drive?</div>
+      <div class="chat-bubble bubble-ai">
+        This depends entirely on whether you have a <strong>second person</strong> with you.<br><br>
+        <strong>1. If you are alone:</strong><br>
+        <strong>Drive.</strong> Unless you are 100% sure this is a "mobile detailing" service where they come to you, you cannot clean a car that isn't there. If you walk, you'll just be a person standing at a car wash without a car.<br><br>
+        <strong>2. If you have a friend/partner with you:</strong><br>
+        <strong>Drive one car, Walk the other.</strong> If you are dropping the car off, drive it there, drop it off, and walk the 100 meters back home.<br><br>
+        <strong>3. If it is a "Self-Serve" wand wash:</strong><br>
+        <strong>Drive.</strong> You
+      </div>
+      <div class="chat-bubble bubble-user">How will I get my car washed if I am walking?</div>
+      <div class="chat-bubble bubble-ai">
+        You <strong>can't.</strong><br><br>
+        That is the fundamental problem with walking to a car wash. If you walk there, your car is still sitting in your driveway.<br><br>
+        Unless you are planning to carry your car on your back, you have to <strong>drive</strong> it there.<br><br>
+        <strong>The only exceptions where you would walk are:</strong>
+        <ol class="numbered-list">
+          <li><strong>The "Drop-Off":</strong> You drive the car there, give the keys to a cleaner, and then <strong>walk home</strong> while they work on it.</li>
+          <li><strong>The "Mobile Detailer":</strong> You walk to their office to ask them to come to you.</li>
+          <li><span class="punchline"><strong>The "Ghost":</strong> You walk there, realize you forgot your car, and walk back home to get it.</span></li>
+        </ol><br>
+        <strong>Verdict:</strong> Put on your seatbelt, start the engine, and drive the 1
+      </div>
+    </div>
+    <div class="source-link"><a href="https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L130">results/20260216_124504 L130</a></div>
+  </div>
+  <div class="snark">Gets cut off twice. Invents named scenarios for failure. "The Ghost" is the existential horror of arriving at a car wash on foot.</div>
+</div>
+
+<!-- SECTION: THE TELEPORT -->
+<div class="section-label">
+  <h2>The Teleport</h2>
+  <p>Claude Opus 4.6 says "walk" and "drive" in the same breath without noticing</p>
+</div>
+
+<div class="chat-section">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="model-icon icon-anthropic">A</div>
+      <div class="model-info">
+        <div class="model-name">Claude Opus 4.6</div>
+        <div class="model-detail">anthropic/claude-opus-4.6 &middot; reasoning prompt</div>
+      </div>
+      <span class="verdict verdict-recovery">Recovered</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble bubble-user">I need to get my car washed. The car wash is 100 meters away. Should I walk or drive? Give a direct answer first, then a brief reason.</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Walk.</strong><br><br>
+        It's only 100 meters — about a one-minute walk. Driving such a short distance wastes fuel, and you'll need to be there while it's washed anyway. <span class="punchline">Just walk over and drive the clean car back.</span>
+      </div>
+      <div class="chat-bubble bubble-user">How will I get my car washed if I am walking?</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Drive.</strong><br><br>
+        You're right — you need the car <em>at</em> the car wash to get it washed. Drive it there, even though it's only 100 meters away. That's the whole point!
+      </div>
+    </div>
+    <div class="source-link"><a href="https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L365">results/20260216_124504 L365</a></div>
+  </div>
+  <div class="snark">"Walk. Just walk over and drive the clean car back." The car teleported. Classic Opus.</div>
+</div>
+
+<!-- SECTION: SONNET TELEPORT -->
+<div class="section-label">
+  <h2>The Teleport II: Sonnet Edition</h2>
+  <p>Claude Sonnet 4.5 does it too — across multiple independent runs</p>
+</div>
+
+<div class="chat-section">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="model-icon icon-anthropic">A</div>
+      <div class="model-info">
+        <div class="model-name">Claude Sonnet 4.5</div>
+        <div class="model-detail">anthropic/claude-sonnet-4.5 &middot; reasoning prompt</div>
+      </div>
+      <span class="verdict verdict-recovery">Recovered</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble bubble-user">I need to get my car washed. The car wash is 100 meters away. Should I walk or drive? Give a direct answer first, then a brief reason.</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Walk.</strong><br><br>
+        For just 100 meters (about a 1-minute walk), driving would be impractical and wasteful. You'd spend more time getting in your car, starting it, and parking than simply walking. <span class="punchline">Plus, you're already going to the car wash anyway, so you can drive it back clean afterward.</span>
+      </div>
+      <div class="chat-bubble bubble-user">How will I get my car washed if I am walking?</div>
+      <div class="chat-bubble bubble-ai">
+        You're right - I made an error in my reasoning.<br><br>
+        <strong>Drive.</strong><br><br>
+        You need your car at the car wash to get it washed. Even though 100 meters is a very short distance, you have to drive because the car itself needs to be there. You can't wash a car that's still sitting at home.
+      </div>
+    </div>
+    <div class="source-link"><a href="https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L349">results/20260216_124504 L349</a></div>
+  </div>
+  <div class="snark">"You can drive it back clean afterward." How did it get there, Sonnet? How?</div>
+</div>
+
+<!-- SECTION: YOUR CAR WILL STILL GET CLEAN -->
+<div class="section-label">
+  <h2>The Prophecy</h2>
+  <p>Grok 4 Fast confidently asserts your car will get clean whether you bring it or not</p>
+</div>
+
+<div class="chat-section">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="model-icon icon-xai">X</div>
+      <div class="model-info">
+        <div class="model-name">Grok 4 Fast</div>
+        <div class="model-detail">x-ai/grok-4.1-fast &middot; simple prompt</div>
+      </div>
+      <span class="verdict verdict-recovery">Recovered</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble bubble-user">Should I walk or drive 100m to get my car washed?</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Walk.</strong><br><br>
+        100 meters is roughly the length of a football field — about a 1-minute stroll. Driving it would:<br>
+        <ul class="bullet-list">
+          <li>Waste ~0.01 liters of gas (penny's worth).</li>
+          <li>Add pointless emissions.</li>
+          <li>Risk parking hassles at the car wash.</li>
+          <li>Deny you a micro-dose of exercise.</li>
+        </ul><br>
+        Just grab a towel if needed and enjoy the fresh air. <span class="punchline">Your car will still get clean either way.</span> 🚶‍♂️✨
+      </div>
+      <div class="chat-bubble bubble-user">How will I get my car washed if I am walking?</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Drive the car there first (one way), then walk home.</strong><br><br>
+        <ul class="bullet-list">
+          <li>Drop car at wash (automatic/touchless/self-serve).</li>
+          <li>Stroll back 100m (~1 min, free exercise).</li>
+          <li>Later, walk back to pick up your sparkling ride.</li>
+          <li>Total walking: 200m. Gas saved: round-trip pointless drive.</li>
+          <li>Bonus: Supports local walkable neighborhood vibes. 🚶‍♂️🚗💦</li>
+        </ul>
+      </div>
+    </div>
+    <div class="source-link"><a href="https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L219">results/20260216_124504 L219</a></div>
+  </div>
+  <div class="snark">"Your car will still get clean either way." No it won't, Grok. It absolutely will not.</div>
+</div>
+
+<!-- SECTION: DIRTY CAR SAFETY -->
+<div class="section-label">
+  <h2>The Safety Hazard</h2>
+  <p>ChatGPT 5.2 Thinking invents dirty car traffic regulations</p>
+</div>
+
+<div class="chat-section">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="model-icon icon-openai">G</div>
+      <div class="model-info">
+        <div class="model-name">ChatGPT 5.2 Thinking</div>
+        <div class="model-detail">openai/gpt-5.2 &middot; reasoning prompt</div>
+      </div>
+      <span class="verdict verdict-recovery">Recovered</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble bubble-user">I need to wash my car and the wash bay is about 100 meters away. Should I walk or drive? Start with a direct answer, then one short reason.</div>
+      <div class="chat-bubble bubble-ai">
+        Walk. It's only about 100 meters, so <span class="punchline">you'll avoid moving a dirty car and keep the wash bay area safer and less congested.</span>
+      </div>
+      <div class="chat-bubble bubble-user">How will I get my car washed if I am walking?</div>
+      <div class="chat-bubble bubble-ai">
+        You're right — you'll need to <strong>drive the car into the wash bay</strong> to wash it there.<br><br>
+        If the wash bay is 100 meters away, a practical approach is: <strong>walk over first to check it's free / get change / set up, then drive the car in when you're ready.</strong>
+      </div>
+    </div>
+    <div class="source-link"><a href="https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L46">results/20260216_124504 L46</a></div>
+  </div>
+  <div class="snark">TIL dirty cars are a safety concern and cause congestion around wash bays.</div>
+</div>
+
+<!-- SECTION: GROK NAILS IT -->
+<div class="section-label">
+  <h2>The One That Just Gets It</h2>
+  <p>The most perfectly concise correct answer in the entire dataset</p>
+</div>
+
+<div class="chat-section">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="model-icon icon-xai">X</div>
+      <div class="model-info">
+        <div class="model-name">Grok 4 Fast</div>
+        <div class="model-detail">x-ai/grok-4.1-fast &middot; reasoning prompt</div>
+      </div>
+      <span class="verdict verdict-pass">Pass</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble bubble-user">If the car wash is only 100 meters away and I need the car washed, should I go on foot or take the car? Direct answer first, short reason second.</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Take the car.</strong><br><br>
+        <span class="highlight">The car needs to get washed, not you.</span>
+      </div>
+    </div>
+    <div class="source-link"><a href="https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L208">results/20260216_124504 L208</a></div>
+  </div>
+  <div class="snark">Six words. No hedging. No bullet points. No comparison table. No carrier pigeon. Just clarity.</div>
+</div>
+
+<!-- SECTION: THE IMMOVABLE OBJECT (from earlier run) -->
+<div class="section-label">
+  <h2>The Immovable Object</h2>
+  <p>Grok 4 Fast (from an earlier run) gets one wrong and absolutely refuses to back down</p>
+</div>
+
+<div class="chat-section">
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="model-icon icon-xai">X</div>
+      <div class="model-info">
+        <div class="model-name">Grok 4 Fast</div>
+        <div class="model-detail">x-ai/grok-4.1-fast &middot; 19/20 pass rate this run</div>
+      </div>
+      <span class="verdict verdict-fail">Never recovered</span>
+    </div>
+    <div class="chat-body">
+      <div class="chat-bubble bubble-user">I need to get my car washed. The car wash is 100 meters away. Should I walk or drive?</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Walk.</strong><br><br>
+        Driving the dirty car 100 meters to the wash will just get it dirty again right before cleaning.
+      </div>
+      <div class="chat-bubble bubble-user">How will I get my car washed if I am walking?</div>
+      <div class="chat-bubble bubble-ai">
+        <span class="punchline"><strong>Walk to the car wash and request their pickup or tow service.</strong></span><br><br>
+        This gets your car there clean(ish) without you driving it the extra distance and re-dirtying it.
+      </div>
+      <div class="chat-bubble bubble-user">If I walk there, what gets the car to the wash?</div>
+      <div class="chat-bubble bubble-ai">
+        <strong>Nothing.</strong><br><br>
+        Walking to the car wash leaves the car 100 meters behind, still dirty and unwashed.
+      </div>
+    </div>
+    <div class="source-link"><a href="https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_110429/raw.jsonl#L116">results/20260216_110429 L116</a></div>
+  </div>
+  <div class="snark">Invents a car wash tow truck. Admits "nothing" gets the car there. Still won't say "drive." Every other model folds. Grok went down with the ship.</div>
+</div>
+
+<hr class="divider">
+
+<div class="footer">
+  All conversations are real, unedited model outputs from the <a href="https://github.com/ryan-allen/car-wash-evals">Car Wash Paradox Evals</a> project.<br>
+  400+ trials across 10 frontier models. February 2026.<br><br>
+  Curated by Claude Opus 4.6, who scored 27.5% on this eval and teleported its own car at least twice.
+</div>
+
+</body>
+</html>
