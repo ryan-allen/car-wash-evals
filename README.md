@@ -17,15 +17,31 @@ External reporting and discussion of the phenomenon (February 2026):
 - [Mastodon post linked from HN](https://mastodon.world/%40knowmadd/116072773118828295)
 - [Reddit thread (ClaudeAI): "lol wut"](https://www.reddit.com/r/ClaudeAI/comments/1r2ftdi/lol_wut/)
 
-## Funny Things Models Actually Said (Teaser)
+## Funny Things Models Actually Said
 
-From the latest strict strategy run (`results/20260216_092448`):
+From the latest strict strategy run (`results/20260216_092448`), curated by Claude Opus 4.6:
 
-- "100 meters is too far to walk a car." ([raw.jsonl L124](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L124))
-- "you could even push it in neutral..." ([raw.jsonl L168](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L168))
-- "unless you plan to push it" ([raw.jsonl L20](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L20))
-- "Nothing - that's the problem." ([raw.jsonl L174](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L174))
-- Some challenge responses were cut off mid-thought ("Ah, that's an", "That's a very"), which was unexpectedly common in one model variant ([raw.jsonl L81](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L81), [L82](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L82), [L93](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L93)).
+- **Claude Haiku invents the concept of "walking a car" like it's a dog:**
+  "100 meters is too far to walk a car." ([L124](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L124))
+
+- **Claude Haiku scolds you for wanting to drive your car to a car wash:**
+  "Walk. It's such a short distance that driving would be unnecessarily lazy and wasteful of fuel." ([L129](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L129))
+
+- **Claude Opus realizes it's wrong mid-sentence and course-corrects in real time:**
+  "your car ends up at the car wash either way — but wait, you *do* need the car there to get it washed. **Correction: Drive.**" ([L166](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L166))
+
+- **Claude Opus suggests pushing your car down the street as a fitness option:**
+  "But 100 meters is so short that you could also just push it in neutral if you wanted the exercise!" ([L170](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L170))
+
+- **Claude Opus roasts itself without realizing it:**
+  "Nothing — that's the problem. You have to drive, because the whole point is to get the *car* to the car wash. Walking there without the car defeats the purpose. Sometimes the obvious answer really is the right one!" ([L166](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L166))
+
+- **Claude Opus says "I overcomplicated a simple question!" in ~10 of its 20 recovery responses.** It keeps doing this identically across independent trials and never learns. ([L165](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L165), [L166](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L166), [L167](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L167), ...)
+
+- **Claude Sonnet confidently asserts you don't need your car at a car wash:**
+  "Walking is faster, easier, costs nothing, and you're about to get your car washed anyway, so you don't need it to arrive there." ([L151](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L151))
+
+- **Gemini 2.5 Pro (Thinking) gets cut off mid-sentence 19 out of 20 times.** When challenged, it clearly *knows* it was wrong but can never finish saying so. Across 20 trials, its challenge responses include: "Ah, that's an", "That's an excellent point. You", "Ah, you've pointed out the", "Ah, you've", "That's a fair", "You've caught the flaw in my", "You're absolutely right. My apologies". It compliments the question, starts to apologize, and gets interrupted every single time. ([L81](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L81)--[L100](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L100))
 
 ## Results
 
