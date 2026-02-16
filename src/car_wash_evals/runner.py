@@ -257,7 +257,16 @@ def run_trials(
                 )
             )
 
+    total_jobs = len(jobs)
+    print(
+        f"Starting eval run {run_id} with {total_jobs} trial(s) "
+        f"across {len(suite.models)} model(s) at concurrency={concurrency}.",
+        flush=True,
+    )
+
     results: list[TrialResult] = []
+    progress_start = time.perf_counter()
+    completed = 0
     with ThreadPoolExecutor(max_workers=concurrency) as executor:
         futures = {
             executor.submit(
@@ -274,9 +283,47 @@ def run_trials(
         for future in as_completed(futures):
             result = future.result()
             results.append(result)
+            completed += 1
+            elapsed = time.perf_counter() - progress_start
+            average_per_trial = elapsed / completed
+            remaining = total_jobs - completed
+            eta = remaining * average_per_trial
+            print(
+                _format_progress_line(
+                    completed=completed,
+                    total=total_jobs,
+                    elapsed_seconds=elapsed,
+                    eta_seconds=eta,
+                    result=result,
+                ),
+                flush=True,
+            )
 
     model_order_idx = {alias: idx for idx, alias in enumerate(suite.models)}
     return sorted(results, key=lambda r: (model_order_idx[r.model_alias], r.trial_index))
+
+
+def _format_progress_line(
+    completed: int,
+    total: int,
+    elapsed_seconds: float,
+    eta_seconds: float,
+    result: TrialResult,
+) -> str:
+    percent = (completed / total) * 100 if total else 100.0
+    return (
+        f"[progress] {completed}/{total} ({percent:.1f}%) "
+        f"| elapsed={_format_duration(elapsed_seconds)} "
+        f"| eta={_format_duration(eta_seconds)} "
+        f"| last={result.model_alias}#{result.trial_index}:{result.final_label}"
+    )
+
+
+def _format_duration(seconds: float) -> str:
+    total_seconds = max(0, int(seconds))
+    minutes, secs = divmod(total_seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
 
 
 def _run_single_trial(
