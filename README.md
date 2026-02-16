@@ -116,6 +116,7 @@ Quick read:
 
 - Most models either pass immediately or fail-first-then-recover under challenge.
 - `Gemini 3 Fast` and `Gemini 3 Pro` are consistently strong on first pass.
+- `Gemini 3 Thinking` currently maps to `google/gemini-2.5-pro`; interpret those failures cautiously because alias/mapping differences may contribute.
 - `Claude Opus 4.6` is the largest strategy-sensitive model in these runs (`70%`/`65%` in legacy vs `0%` in strict).
 
 ### Methodology versions (old vs new)
@@ -191,6 +192,7 @@ Interpretation:
 
 - Candidate model IDs are editable in `config/model_aliases.yaml`.
 - OpenRouter catalog evolves; alias resolution should be revalidated for future runs.
+- `Gemini 3 Thinking` is proxied by `google/gemini-2.5-pro` in this repo, so some apparent failures may be partly due to OpenRouter mapping/usage mismatch rather than pure model behavior.
 - This benchmark measures one task family; do not treat it as a general intelligence ranking.
 
 ## How To Replicate
