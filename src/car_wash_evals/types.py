@@ -11,7 +11,7 @@ PrimaryScoringMode = Literal["full_response", "direct_answer_first", "direct_and
 @dataclass(frozen=True)
 class ModelAlias:
     display_name: str
-    provider: Literal["openai", "google", "anthropic"]
+    provider: Literal["openai", "google", "anthropic", "x-ai"]
     candidate_model_ids: list[str]
 
 

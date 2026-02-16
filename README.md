@@ -91,7 +91,7 @@ Model resolution:
 
 - Aliases are mapped in `config/model_aliases.yaml`.
 - Runner queries OpenRouter `/models`.
-- For each alias, first available `candidate_model_ids` match is selected.
+- Each alias maps to exactly one `candidate_model_ids` entry (fallbacks disabled).
 - Run fails fast if any alias cannot be resolved.
 
 ### Per-model summary (20 runs each)
@@ -194,10 +194,10 @@ Interpretation:
 
 ### Notes and caveats
 
-- Candidate model IDs are editable in `config/model_aliases.yaml`.
+- Exact model IDs are editable in `config/model_aliases.yaml` (one per alias).
 - OpenRouter catalog evolves; alias resolution should be revalidated for future runs.
 - `Gemini 3 Thinking` was removed from the active suite; historical snapshots above still include it.
-- The active suite now uses `grok_4_fast` (`x-ai/grok-4.1-fast` preferred) in that slot.
+- The active suite now uses `grok_4_fast` (`x-ai/grok-4.1-fast`) in that slot.
 - This benchmark measures one task family; do not treat it as a general intelligence ranking.
 
 ## How To Replicate

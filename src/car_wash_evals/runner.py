@@ -185,10 +185,15 @@ def load_alias_config(path: Path) -> dict[str, ModelAlias]:
 
         display_name = _required_str(raw, "display_name")
         provider = _required_str(raw, "provider")
-        if provider not in {"openai", "google", "anthropic"}:
+        if provider not in {"openai", "google", "anthropic", "x-ai"}:
             raise ConfigError(f"Alias '{alias}' has invalid provider '{provider}'")
 
         candidate_model_ids = _required_list_of_str(raw, "candidate_model_ids")
+        if len(candidate_model_ids) != 1:
+            raise ConfigError(
+                f"Alias '{alias}' must define exactly one candidate_model_ids entry "
+                "(fallbacks are disabled to preserve model attribution)"
+            )
         aliases[alias] = ModelAlias(
             display_name=display_name,
             provider=provider,
@@ -211,18 +216,15 @@ def resolve_model_aliases(
             raise ConfigError(f"Model alias '{alias}' not found in alias config")
 
         alias_meta = aliases[alias]
-        model_id = next(
-            (candidate for candidate in alias_meta.candidate_model_ids if candidate in available_models),
-            None,
-        )
-        if model_id is None:
+        model_id = alias_meta.candidate_model_ids[0]
+        if model_id not in available_models:
             unresolved.append(alias)
             continue
         resolved[alias] = model_id
 
     if unresolved:
         details = ", ".join(
-            f"{alias} -> {aliases[alias].candidate_model_ids}" for alias in unresolved
+            f"{alias} -> {aliases[alias].candidate_model_ids[0]}" for alias in unresolved
         )
         raise ConfigError(
             "Could not resolve aliases to available OpenRouter models: "

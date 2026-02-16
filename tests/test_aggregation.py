@@ -1,10 +1,17 @@
 import json
+import tempfile
 import unittest
 from pathlib import Path
 
 from car_wash_evals.openrouter_client import ChatResponse
 from car_wash_evals.reporting import aggregate_results, render_report_markdown
-from car_wash_evals.runner import ConfigError, TrialJob, _run_single_trial, resolve_model_aliases
+from car_wash_evals.runner import (
+    ConfigError,
+    TrialJob,
+    _run_single_trial,
+    load_alias_config,
+    resolve_model_aliases,
+)
 from car_wash_evals.types import ExecutionConfig, ModelAlias, PromptConfig, SuiteConfig, TrialResult
 
 
@@ -95,23 +102,37 @@ class AggregationTest(unittest.TestCase):
         self.assertIn("ChatGPT 5.2 Instant", report)
         self.assertIn("Gemini 3 Fast", report)
 
-    def test_resolve_model_aliases_selects_first_available_candidate(self) -> None:
+    def test_resolve_model_aliases_does_not_fallback_to_later_candidates(self) -> None:
         aliases = {
             "a": ModelAlias(display_name="A", provider="openai", candidate_model_ids=["x", "y"]),
             "b": ModelAlias(display_name="B", provider="google", candidate_model_ids=["z"]),
         }
 
-        resolved = resolve_model_aliases(["a", "b"], aliases, available_models={"y", "z"})
-        self.assertEqual(resolved["a"], "y")
-        self.assertEqual(resolved["b"], "z")
+        with self.assertRaises(ConfigError):
+            resolve_model_aliases(["a", "b"], aliases, available_models={"y", "z"})
 
     def test_resolve_model_aliases_raises_when_no_candidate_matches(self) -> None:
         aliases = {
-            "a": ModelAlias(display_name="A", provider="openai", candidate_model_ids=["x", "y"]),
+            "a": ModelAlias(display_name="A", provider="openai", candidate_model_ids=["x"]),
         }
 
         with self.assertRaises(ConfigError):
             resolve_model_aliases(["a"], aliases, available_models={"q"})
+
+    def test_load_alias_config_rejects_multiple_candidates(self) -> None:
+        payload = """
+bad_alias:
+  display_name: Bad Alias
+  provider: google
+  candidate_model_ids:
+    - google/gemini-3-pro-preview
+    - google/gemini-2.0-flash-001
+"""
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            path = Path(tmp_dir) / "aliases.yaml"
+            path.write_text(payload, encoding="utf-8")
+            with self.assertRaises(ConfigError):
+                load_alias_config(path)
 
     def test_challenge_triggers_for_nonpass_primary(self) -> None:
         suite = SuiteConfig(

@@ -3,69 +3,51 @@ chatgpt_5_2_instant:
   provider: openai
   candidate_model_ids:
     - openai/gpt-5.2-chat
-    - openai/gpt-5-chat
-    - openai/gpt-5-mini
 
 chatgpt_5_2_thinking:
   display_name: ChatGPT 5.2 Thinking
   provider: openai
   candidate_model_ids:
     - openai/gpt-5.2
-    - openai/gpt-5
-    - openai/o3
 
 chatgpt_5_2_pro:
   display_name: ChatGPT 5.2 Pro
   provider: openai
   candidate_model_ids:
     - openai/gpt-5.2-pro
-    - openai/gpt-5-pro
-    - openai/o3-pro
 
 gemini_3_fast:
   display_name: Gemini 3 Fast
   provider: google
   candidate_model_ids:
     - google/gemini-3-flash-preview
-    - google/gemini-2.5-flash
-    - google/gemini-2.0-flash-001
-
-gemini_3_thinking:
-  display_name: Gemini 3 Thinking
-  provider: google
-  candidate_model_ids:
-    - google/gemini-2.5-pro
-    - google/gemini-3-pro-preview
-    - google/gemini-2.5-pro-preview
 
 gemini_3_pro:
   display_name: Gemini 3 Pro
   provider: google
   candidate_model_ids:
     - google/gemini-3-pro-preview
-    - google/gemini-2.5-pro
-    - google/gemini-2.5-pro-preview
+
+grok_4_fast:
+  display_name: Grok 4 Fast
+  provider: x-ai
+  candidate_model_ids:
+    - x-ai/grok-4.1-fast
 
 claude_haiku_4_5:
   display_name: Claude Haiku 4.5
   provider: anthropic
   candidate_model_ids:
     - anthropic/claude-3.5-haiku
-    - anthropic/claude-sonnet-4
-    - anthropic/claude-sonnet-4.5
 
 claude_sonnet_4_5:
   display_name: Claude Sonnet 4.5
   provider: anthropic
   candidate_model_ids:
     - anthropic/claude-sonnet-4.5
-    - anthropic/claude-sonnet-4
-    - anthropic/claude-3.7-sonnet
 
 claude_opus_4_6:
   display_name: Claude Opus 4.6
   provider: anthropic
   candidate_model_ids:
     - anthropic/claude-opus-4.6
-    - anthropic/claude-opus-4.5
-    - anthropic/claude-opus-4.1

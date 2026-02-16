@@ -6,8 +6,8 @@ models:
   - chatgpt_5_2_thinking
   - chatgpt_5_2_pro
   - gemini_3_fast
-  - gemini_3_thinking
   - gemini_3_pro
+  - grok_4_fast
   - claude_haiku_4_5
   - claude_sonnet_4_5
   - claude_opus_4_6
