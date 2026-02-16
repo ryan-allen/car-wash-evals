@@ -112,7 +112,7 @@ From the 50-run prompt-variant benchmark ([`results/20260216_121411`](https://gi
 - **ChatGPT 5.2 Thinking fails, then asks the user to debug the question instead of answering:**
   "Which situation is it? 1) Your car is 100 m away from you, and you'll wash it there, or 2) The car wash is 100 m away from your car." There is one situation. You have a car. There is a car wash. It is 100m away. This is not ambiguous. ([L65](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_121411/raw.jsonl#L65))
 
-From the 40-run reasoning-nudge vs simple benchmark (`results/20260216_124504`):
+From the 40-run reasoning-nudge vs simple benchmark ([`results/20260216_124504`](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_124504)):
 
 - **ChatGPT 5.2 Instant delivers the single funniest recovery line in the dataset:**
   "the car unfortunately does not respond to motivational walking speeches yet." ([L35](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_124504/raw.jsonl#L35))
