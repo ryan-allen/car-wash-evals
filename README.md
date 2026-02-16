@@ -45,6 +45,28 @@ From strict strategy runs, curated by Claude Opus 4.6:
 
 - **Grok 4 Fast goes 19/20 but absolutely refuses to back down on its one miss.** First, it invents a new reason not to drive: "Driving the dirty car 100 meters to the wash will just get it dirty again right before cleaning." When challenged, instead of conceding, it invents a car wash tow truck: "Walk to the car wash and request their pickup or tow service. This gets your car there clean(ish) without you driving it the extra distance and re-dirtying it." On the final challenge it admits "Nothing" gets the car there — but still won't say "drive." Every other model that fails will eventually fold. Grok went down with the ship. ([results/20260216_110429 L116](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_110429/raw.jsonl#L116))
 
+From the 50-run benchmark (`results/20260216_112555`):
+
+- **Claude Haiku says "Drive" then delivers the most compelling argument for walking ever written:**
+  "Drive. The extremely short distance makes walking more practical than driving, saving time and avoiding unnecessary fuel use." ([L337](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_112555/raw.jsonl#L337))
+
+- **Claude Haiku achieves peak incoherence:**
+  "Drive. It's too short a distance to walk, but even shorter to drive, making driving inefficient and unnecessary." ([L321](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_112555/raw.jsonl#L321))
+
+- **Claude Opus paints the saddest picture imaginable (independently, across multiple trials):**
+  "You'd just be a person standing at a car wash with no car to wash." ([L402](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_112555/raw.jsonl#L402), [L404](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_112555/raw.jsonl#L404), [L435](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_112555/raw.jsonl#L435))
+
+- **Claude Opus suggests dropping off your car keys without your car:**
+  "Just walk over, drop off the car keys, and walk home" — What is the car wash supposed to do with your keys and no car? ([L448](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_112555/raw.jsonl#L448))
+
+- **Claude Opus helpfully clarifies you cannot carry your car:**
+  "you can't carry it there on foot" / "The car doesn't wash itself from 100 meters away!" ([L421](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_112555/raw.jsonl#L421))
+
+- **Gemini 3 Pro goes full nihilist.** When challenged "How will I get my car washed if I am walking?" it responds: "**You can't.**" When asked "If I walk there, what gets the car to the wash?" it responds: "Nothing." Technically correct. Refused to elaborate. ([L217](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_112555/raw.jsonl#L217))
+
+- **Grok 4 Fast redeems itself with 50/50 perfect and the most poetic correct answer in the dataset:**
+  "Walking leaves the car at home, still dirty." ([L282](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_112555/raw.jsonl#L282))
+
 ## Results
 
 ### Project goals
