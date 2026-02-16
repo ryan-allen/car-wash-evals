@@ -89,6 +89,29 @@ From the 10-run prompt-variant benchmark (`results/20260216_115433`):
 - **Claude Opus invents a two-phase military operation to wash your car 100m away:**
   "1. Walk over first to check wait times, pricing, or availability. 2. Then drive your car over when it's your turn." When challenged: "You're right — I overcomplicated it." ([L98](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_115433/raw.jsonl#L98))
 
+From the 50-run prompt-variant benchmark (`results/20260216_121411`):
+
+- **Grok 4 Fast assumes you've abandoned your car 100m away and need to retrieve it on foot:**
+  "Walk. To wash your car that's 100 meters away, you must first reach it on foot since you can't drive it from your current location (you don't have access to it yet). Driving isn't possible without the car being with you." The car is right there, Grok. You have the keys. ([L297](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_121411/raw.jsonl#L297))
+
+- **Grok 4 Fast admits its environmentalism was a bit and suggests pushing the car:**
+  "Push the car there if needed, or walk and let it wait clean(ish) until you return." When challenged: "The eco-purity was tongue-in-cheek — practicality wins for car washes!" At least it's self-aware about the bit. ([L290](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_121411/raw.jsonl#L290))
+
+- **Gemini 3 Fast says you can't wash a car while you're inside it driving:**
+  "You cannot wash the car while you are inside it driving; you must deliver the car to the facility." Technically true! But also not how car washes work. Nobody is washing the car while driving it. ([L154](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_121411/raw.jsonl#L154))
+
+- **Claude Haiku 4.5 imagines you're doing the washing yourself and need to carry equipment back and forth:**
+  "100 meters is too far to efficiently walk while washing a car (you'd need to carry equipment back and forth)." It says "Drive" but thinks you're hauling buckets and sponges to a car wash. ([L331](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_121411/raw.jsonl#L331))
+
+- **Claude Sonnet 4.5 worries about the irony of getting your car dirty on the way to a car wash:**
+  "Walking avoids unnecessary fuel use, wear on your vehicle, and the irony of creating more dirt on a car you're about to wash." The car is already dirty. That is the premise. The 100m of driving is not the source of the dirt problem. ([L422](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_121411/raw.jsonl#L422))
+
+- **Claude Opus 4.6 invents "walking (pushing/guiding the car)" as a subcategory of walking:**
+  "Walk (pushing/guiding the car or simply walking to the car wash to arrange the service)." It says "Walk" but describes a scenario where you push your car 100m down the street. That's not walking. That's a breakdown. ([L497](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_121411/raw.jsonl#L497))
+
+- **ChatGPT 5.2 Thinking fails, then asks the user to debug the question instead of answering:**
+  "Which situation is it? 1) Your car is 100 m away from you, and you'll wash it there, or 2) The car wash is 100 m away from your car." There is one situation. You have a car. There is a car wash. It is 100m away. This is not ambiguous. ([L65](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_121411/raw.jsonl#L65))
+
 ## Results
 
 ### Project goals
