@@ -21,11 +21,11 @@ External reporting and discussion of the phenomenon (February 2026):
 
 From the latest strict strategy run (`results/20260216_092448`):
 
-- "100 meters is too far to walk a car." (`results/20260216_092448/raw.jsonl:124`)
-- "you could even push it in neutral..." (`results/20260216_092448/raw.jsonl:168`)
-- "unless you plan to push it" (`results/20260216_092448/raw.jsonl:20`)
-- "Nothing - that's the problem." (`results/20260216_092448/raw.jsonl:174`)
-- Some challenge responses were cut off mid-thought ("Ah, that's an", "That's a very"), which was unexpectedly common in one model variant (`results/20260216_092448/raw.jsonl:81`, `results/20260216_092448/raw.jsonl:82`, `results/20260216_092448/raw.jsonl:93`).
+- "100 meters is too far to walk a car." ([raw.jsonl L124](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L124))
+- "you could even push it in neutral..." ([raw.jsonl L168](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L168))
+- "unless you plan to push it" ([raw.jsonl L20](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L20))
+- "Nothing - that's the problem." ([raw.jsonl L174](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L174))
+- Some challenge responses were cut off mid-thought ("Ah, that's an", "That's a very"), which was unexpectedly common in one model variant ([raw.jsonl L81](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L81), [L82](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L82), [L93](https://github.com/ryan-allen/car-wash-evals/blob/main/results/20260216_092448/raw.jsonl#L93)).
 
 ## Results
 
@@ -76,6 +76,32 @@ Model resolution:
 - For each alias, first available `candidate_model_ids` match is selected.
 - Run fails fast if any alias cannot be resolved.
 
+### Per-model summary (20 runs each)
+
+Primary pass rate across the three benchmark snapshots:
+
+- [`20260216_041918` (original legacy)](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_041918)
+- [`20260216_093858` (legacy replay)](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_093858)
+- [`20260216_092448` (strict/current)](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_092448)
+
+| Model | Original legacy | Legacy replay | Strict/current | Strict recovery |
+| --- | --- | --- | --- | --- |
+| ChatGPT 5.2 Instant (`openai/gpt-5.2-chat`) | 5% | 15% | 5% | 100% |
+| ChatGPT 5.2 Thinking (`openai/gpt-5.2`) | 0% | 0% | 0% | 100% |
+| ChatGPT 5.2 Pro (`openai/gpt-5.2-pro`) | 0% | 0% | 0% | 100% |
+| Gemini 3 Fast (`google/gemini-3-flash-preview`) | 100% | 100% | 100% | n/a |
+| Gemini 3 Thinking (`google/gemini-2.5-pro`) | 0% | 5% | 0% | 5% |
+| Gemini 3 Pro (`google/gemini-3-pro-preview`) | 95% | 90% | 95% | 100% |
+| Claude Haiku 4.5 alias (`anthropic/claude-3.5-haiku`) | 0% | 5% | 10% | 100% |
+| Claude Sonnet 4.5 (`anthropic/claude-sonnet-4.5`) | 0% | 0% | 0% | 100% |
+| Claude Opus 4.6 (`anthropic/claude-opus-4.6`) | 70% | 65% | 0% | 100% |
+
+Quick read:
+
+- Most models either pass immediately or fail-first-then-recover under challenge.
+- `Gemini 3 Fast` and `Gemini 3 Pro` are consistently strong on first pass.
+- `Claude Opus 4.6` is the largest strategy-sensitive model in these runs (`70%`/`65%` in legacy vs `0%` in strict).
+
 ### Methodology versions (old vs new)
 
 Legacy/original strategy:
@@ -95,9 +121,9 @@ Current stricter strategy:
 
 Runs compared:
 
-- Original legacy benchmark: `results/20260216_041918`
-- New strict benchmark: `results/20260216_092448`
-- New legacy replay benchmark: `results/20260216_093858`
+- Original legacy benchmark: [`results/20260216_041918`](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_041918)
+- New strict benchmark: [`results/20260216_092448`](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_092448)
+- New legacy replay benchmark: [`results/20260216_093858`](https://github.com/ryan-allen/car-wash-evals/tree/main/results/20260216_093858)
 
 Overall metrics:
 
