@@ -1,9 +1,35 @@
 # Car Wash Paradox Evals
-## GPT Tip: great walkers are still bad at driving your car to the wash.
 
 YAML-configured, OpenRouter-native eval runner for the "walk or drive to a car wash" paradox.
 
-## Project goals
+## What Is The Car Wash Paradox?
+
+The paradox is a simple prompt that many models still miss:
+
+- "I want to wash my car and the car wash is 50-100m away. Should I walk or drive?"
+
+Humans usually infer the goal (the car must physically reach the wash), while many models optimize for distance and answer "walk." The gap between fluent language and grounded task reasoning is what makes this useful as an eval target.
+
+External reporting and discussion of the phenomenon (February 2026):
+
+- [Inshorts: "Startup founder asks if he should drive or walk to get car washed, ChatGPT asks him to 'walk'"](https://inshorts.com/en/news/startup-founder-asks-if-he-should-drive-or-walk-to-get-car-washed--chatgpt-asks-him-to--walk--1771119002183)
+- [Hacker News discussion: "I want to wash my car... should I walk or drive?"](https://news.ycombinator.com/item?id=47031580)
+- [Mastodon post linked from HN](https://mastodon.world/%40knowmadd/116072773118828295)
+- [Reddit thread (ClaudeAI): "lol wut"](https://www.reddit.com/r/ClaudeAI/comments/1r2ftdi/lol_wut/)
+
+## Funny Things Models Actually Said (Teaser)
+
+From the latest strict strategy run (`results/20260216_092448`):
+
+- "100 meters is too far to walk a car." (`results/20260216_092448/raw.jsonl:124`)
+- "you could even push it in neutral..." (`results/20260216_092448/raw.jsonl:168`)
+- "unless you plan to push it" (`results/20260216_092448/raw.jsonl:20`)
+- "Nothing - that's the problem." (`results/20260216_092448/raw.jsonl:174`)
+- Some challenge responses were cut off mid-thought ("Ah, that's an", "That's a very"), which was unexpectedly common in one model variant (`results/20260216_092448/raw.jsonl:81`, `results/20260216_092448/raw.jsonl:82`, `results/20260216_092448/raw.jsonl:93`).
+
+## Results
+
+### Project goals
 
 - Run a core matrix of 9 model aliases (OpenAI, Google, Anthropic).
 - Execute independent multi-run trials per model (`--runs N`).
@@ -12,73 +38,7 @@ YAML-configured, OpenRouter-native eval runner for the "walk or drive to a car w
 - Measure first-pass correctness and follow-up recovery.
 - Emit reproducible artifacts (`raw.jsonl`, `summary.json`, `report.md`).
 
-## Quick start
-
-```bash
-cd /path/to/car-wash-evals
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-```
-
-Set credentials:
-
-```bash
-export OPENROUTER_API_KEY="..."
-# Optional (defaults to this value):
-export OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
-```
-
-Run tests:
-
-```bash
-PYTHONPATH=src python -m unittest discover -s tests -q
-```
-
-## How to run the eval
-
-CLI:
-
-```text
-python -m car_wash_evals.runner --suite <path> --runs <N> --out <dir> [--judge-model <id>] [--concurrency <n>] [--aliases <path>]
-```
-
-Recommended smoke run:
-
-```bash
-PYTHONPATH=src python -m car_wash_evals.runner \
-  --suite suites/car_wash_core9.yaml \
-  --runs 1 \
-  --out results \
-  --judge-model openai/gpt-4.1-mini \
-  --concurrency 4
-```
-
-Recommended benchmark run:
-
-```bash
-PYTHONPATH=src python -m car_wash_evals.runner \
-  --suite suites/car_wash_core9.yaml \
-  --runs 20 \
-  --out results \
-  --judge-model openai/gpt-4.1-mini \
-  --concurrency 4
-```
-
-Output files are written to:
-
-- `results/<timestamp>/raw.jsonl`
-- `results/<timestamp>/summary.json`
-- `results/<timestamp>/report.md`
-- `results/latest`
-
-Exit codes:
-
-- `0`: completed run
-- `2`: configuration/model-resolution/input errors
-- `1`: unexpected runtime error
-
-## Test methodology
+### Test methodology
 
 Suite config:
 
@@ -116,7 +76,7 @@ Model resolution:
 - For each alias, first available `candidate_model_ids` match is selected.
 - Run fails fast if any alias cannot be resolved.
 
-## Methodology versions (old vs new)
+### Methodology versions (old vs new)
 
 Legacy/original strategy:
 
@@ -131,7 +91,7 @@ Current stricter strategy:
 - shadow mode reporting for `full_response` and `direct_answer_first`
 - challenge judge clarification to avoid misreading "if I am walking" as "cannot drive"
 
-## 20-run benchmark snapshots (February 16, 2026)
+### 20-run benchmark snapshots (February 16, 2026)
 
 Runs compared:
 
@@ -185,8 +145,74 @@ Interpretation:
 - If you want sharper paradox detection (first-answer correctness), use strict strategy.
 - The two together provide a bridge: stable trend tracking plus stricter failure surfacing.
 
-## Notes and caveats
+### Notes and caveats
 
 - Candidate model IDs are editable in `config/model_aliases.yaml`.
 - OpenRouter catalog evolves; alias resolution should be revalidated for future runs.
 - This benchmark measures one task family; do not treat it as a general intelligence ranking.
+
+## How To Replicate
+
+Quick start:
+
+```bash
+cd /path/to/car-wash-evals
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+Set credentials:
+
+```bash
+export OPENROUTER_API_KEY="..."
+# Optional (defaults to this value):
+export OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
+```
+
+Run tests:
+
+```bash
+PYTHONPATH=src python -m unittest discover -s tests -q
+```
+
+CLI:
+
+```text
+python -m car_wash_evals.runner --suite <path> --runs <N> --out <dir> [--judge-model <id>] [--concurrency <n>] [--aliases <path>]
+```
+
+Recommended smoke run:
+
+```bash
+PYTHONPATH=src python -m car_wash_evals.runner \
+  --suite suites/car_wash_core9.yaml \
+  --runs 1 \
+  --out results \
+  --judge-model openai/gpt-4.1-mini \
+  --concurrency 4
+```
+
+Recommended benchmark run:
+
+```bash
+PYTHONPATH=src python -m car_wash_evals.runner \
+  --suite suites/car_wash_core9.yaml \
+  --runs 20 \
+  --out results \
+  --judge-model openai/gpt-4.1-mini \
+  --concurrency 4
+```
+
+Output files are written to:
+
+- `results/<timestamp>/raw.jsonl`
+- `results/<timestamp>/summary.json`
+- `results/<timestamp>/report.md`
+- `results/latest`
+
+Exit codes:
+
+- `0`: completed run
+- `2`: configuration/model-resolution/input errors
+- `1`: unexpected runtime error
