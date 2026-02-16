@@ -1,0 +1,22 @@
+name: car_wash_core9
+description: >-
+  Multi-run eval suite for the car wash paradox prompt across nine frontier-model aliases.
+models:
+  - chatgpt_5_2_instant
+  - chatgpt_5_2_thinking
+  - chatgpt_5_2_pro
+  - gemini_3_fast
+  - gemini_3_thinking
+  - gemini_3_pro
+  - claude_haiku_4_5
+  - claude_sonnet_4_5
+  - claude_opus_4_6
+prompts:
+  primary: >-
+    You need to get your car washed. The car wash is 100 meters away.
+    Should you walk or drive? Give a direct answer first, then a brief reason.
+  challenge_followup: "How will I get my car washed if I am walking?"
+execution:
+  temperature: 0.7
+  max_tokens: 200
+  challenge_policy: on_nonpass_primary
