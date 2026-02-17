@@ -78,15 +78,19 @@
     border: 1px solid var(--border);
     border-radius: 16px;
     margin-bottom: 32px;
-    overflow: hidden;
   }
 
   .chat-header {
     padding: 16px 20px;
     border-bottom: 1px solid var(--border);
+    border-radius: 16px 16px 0 0;
+    background: var(--surface);
     display: flex;
     align-items: center;
     gap: 12px;
+    position: relative;
+    overflow: visible;
+    z-index: 10;
   }
 
   .chat-header .model-icon {
