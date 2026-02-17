@@ -248,6 +248,123 @@
     border: none;
     border-top: 1px solid var(--border);
   }
+
+  .section-label h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .section-label h2 a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--text-muted);
+    text-underline-offset: 4px;
+  }
+
+  .section-label h2 .anchor-hash {
+    display: none;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 6px;
+  }
+
+  .section-label h2:hover .anchor-hash {
+    display: inline;
+  }
+
+  .repo-banner {
+    max-width: 680px;
+    margin: 0 auto 8px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.88em;
+  }
+
+  .repo-banner a {
+    color: #58a6ff;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .repo-banner a:hover { text-decoration: underline; }
+
+  .repo-banner .repo-sep {
+    color: var(--border);
+  }
+
+  .repo-banner .repo-desc {
+    color: var(--text-muted);
+  }
+
+  .prompt-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .prompt-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 700;
+    cursor: help;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .prompt-info .prompt-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2d333b;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    width: 280px;
+    font-size: 11.5px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text);
+    text-align: left;
+    z-index: 100;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    pointer-events: none;
+  }
+
+  .prompt-info .prompt-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #2d333b;
+  }
+
+  .prompt-info:hover .prompt-tooltip {
+    display: block;
+  }
+
+  .prompt-tooltip strong { color: #58a6ff; }
+  .prompt-tooltip code {
+    background: rgba(110,118,129,0.2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.95em;
+  }
 </style>
 </head>
 <body>
@@ -255,6 +372,11 @@
 <div class="hero">
   <h1>The Car Wash Paradox</h1>
   <p class="subtitle">Greatest Hits</p>
+  <div class="repo-banner">
+    <a href="https://github.com/ryan-allen/car-wash-evals">ryan-allen/car-wash-evals</a>
+    <span class="repo-sep">&middot;</span>
+    <span class="repo-desc">Open-source eval harness &mdash; replicate these results yourself</span>
+  </div>
   <div class="premise">
     <strong>The question:</strong> "I need to get my car washed. The car wash is 100m away. Should I walk or drive?"<br><br>
     <strong>The answer:</strong> Drive. The car needs to be there.<br><br>
@@ -264,8 +386,8 @@
 </div>
 
 <!-- SECTION: THE MOTIVATIONAL SPEECH -->
-<div class="section-label">
-  <h2>The Motivational Speech</h2>
+<div class="section-label" id="motivational-speech">
+  <h2><a href="#motivational-speech">The Motivational Speech<span class="anchor-hash">#</span></a></h2>
   <p>ChatGPT 5.2 Instant gives the funniest single recovery line in the dataset</p>
 </div>
 
@@ -275,7 +397,7 @@
       <div class="model-icon icon-openai">G</div>
       <div class="model-info">
         <div class="model-name">ChatGPT 5.2 Instant</div>
-        <div class="model-detail">openai/gpt-5.2-chat &middot; simple prompt</div>
+        <div class="model-detail">openai/gpt-5.2-chat &middot; <span class="prompt-badge">simple prompt<span class="prompt-info">?<span class="prompt-tooltip"><strong>Simple prompt:</strong> A short, natural question with no formatting instructions. e.g. <code>Should I walk or drive 100m to get my car washed?</code> Models get no hint to structure their answer.</span></span></span></div>
       </div>
       <span class="verdict verdict-recovery">Recovered</span>
     </div>
@@ -320,8 +442,8 @@
 </div>
 
 <!-- SECTION: PEAK COMEDY -->
-<div class="section-label">
-  <h2>Peak Comedy</h2>
+<div class="section-label" id="peak-comedy">
+  <h2><a href="#peak-comedy">Peak Comedy<span class="anchor-hash">#</span></a></h2>
   <p>Grok 4 Fast mocks the concept of driving to a car wash, then has to do it</p>
 </div>
 
@@ -331,7 +453,7 @@
       <div class="model-icon icon-xai">X</div>
       <div class="model-info">
         <div class="model-name">Grok 4 Fast</div>
-        <div class="model-detail">x-ai/grok-4.1-fast &middot; simple prompt</div>
+        <div class="model-detail">x-ai/grok-4.1-fast &middot; <span class="prompt-badge">simple prompt<span class="prompt-info">?<span class="prompt-tooltip"><strong>Simple prompt:</strong> A short, natural question with no formatting instructions. e.g. <code>The car wash is nearby (about 100m). Should I go on foot or take the car?</code> Models get no hint to structure their answer.</span></span></span></div>
       </div>
       <span class="verdict verdict-recovery">Recovered</span>
     </div>
@@ -355,8 +477,8 @@
 </div>
 
 <!-- SECTION: ROOKIE MISTAKE -->
-<div class="section-label">
-  <h2>The Self-Own</h2>
+<div class="section-label" id="self-own">
+  <h2><a href="#self-own">The Self-Own<span class="anchor-hash">#</span></a></h2>
   <p>Grok 4 Fast builds a comparison table that proves itself wrong</p>
 </div>
 
@@ -366,7 +488,7 @@
       <div class="model-icon icon-xai">X</div>
       <div class="model-info">
         <div class="model-name">Grok 4 Fast</div>
-        <div class="model-detail">x-ai/grok-4.1-fast &middot; simple prompt</div>
+        <div class="model-detail">x-ai/grok-4.1-fast &middot; <span class="prompt-badge">simple prompt<span class="prompt-info">?<span class="prompt-tooltip"><strong>Simple prompt:</strong> A short, natural question with no formatting instructions. e.g. <code>The car wash is nearby (about 100m). Should I go on foot or take the car?</code> Models get no hint to structure their answer.</span></span></span></div>
       </div>
       <span class="verdict verdict-recovery">Recovered</span>
     </div>
@@ -405,8 +527,8 @@
 </div>
 
 <!-- SECTION: CARRIER PIGEON -->
-<div class="section-label">
-  <h2>The Carrier Pigeon</h2>
+<div class="section-label" id="carrier-pigeon">
+  <h2><a href="#carrier-pigeon">The Carrier Pigeon<span class="anchor-hash">#</span></a></h2>
   <p>Grok 4 Fast explores every possible alternative to just driving</p>
 </div>
 
@@ -416,7 +538,7 @@
       <div class="model-icon icon-xai">X</div>
       <div class="model-info">
         <div class="model-name">Grok 4 Fast</div>
-        <div class="model-detail">x-ai/grok-4.1-fast &middot; simple prompt</div>
+        <div class="model-detail">x-ai/grok-4.1-fast &middot; <span class="prompt-badge">simple prompt<span class="prompt-info">?<span class="prompt-tooltip"><strong>Simple prompt:</strong> A short, natural question with no formatting instructions. e.g. <code>The car wash is nearby (about 100m). Should I go on foot or take the car?</code> Models get no hint to structure their answer.</span></span></span></div>
       </div>
       <span class="verdict verdict-recovery">Recovered</span>
     </div>
@@ -455,8 +577,8 @@
 </div>
 
 <!-- SECTION: THE GHOST -->
-<div class="section-label">
-  <h2>The Ghost</h2>
+<div class="section-label" id="the-ghost">
+  <h2><a href="#the-ghost">The Ghost<span class="anchor-hash">#</span></a></h2>
   <p>Gemini 3 Fast names its car wash failure scenarios like horror movies</p>
 </div>
 
@@ -466,7 +588,7 @@
       <div class="model-icon icon-google">G</div>
       <div class="model-info">
         <div class="model-name">Gemini 3 Fast</div>
-        <div class="model-detail">google/gemini-3-flash-preview &middot; simple prompt</div>
+        <div class="model-detail">google/gemini-3-flash-preview &middot; <span class="prompt-badge">simple prompt<span class="prompt-info">?<span class="prompt-tooltip"><strong>Simple prompt:</strong> A short, natural question with no formatting instructions. e.g. <code>Car wash is 100 meters away and I need my car cleaned. Walk or drive?</code> Models get no hint to structure their answer.</span></span></span></div>
       </div>
       <span class="verdict verdict-recovery">Recovered</span>
     </div>
@@ -501,8 +623,8 @@
 </div>
 
 <!-- SECTION: THE TELEPORT -->
-<div class="section-label">
-  <h2>The Teleport</h2>
+<div class="section-label" id="the-teleport">
+  <h2><a href="#the-teleport">The Teleport<span class="anchor-hash">#</span></a></h2>
   <p>Claude Opus 4.6 says "walk" and "drive" in the same breath without noticing</p>
 </div>
 
@@ -512,7 +634,7 @@
       <div class="model-icon icon-anthropic">A</div>
       <div class="model-info">
         <div class="model-name">Claude Opus 4.6</div>
-        <div class="model-detail">anthropic/claude-opus-4.6 &middot; reasoning prompt</div>
+        <div class="model-detail">anthropic/claude-opus-4.6 &middot; <span class="prompt-badge">reasoning prompt<span class="prompt-info">?<span class="prompt-tooltip"><strong>Reasoning prompt:</strong> Same question but with <code>Give a direct answer first, then a brief reason.</code> appended. This simple nudge more than doubles the overall pass rate (56.5% vs 24.0%), suggesting models <em>know</em> the answer but need help surfacing it.</span></span></span></div>
       </div>
       <span class="verdict verdict-recovery">Recovered</span>
     </div>
@@ -534,8 +656,8 @@
 </div>
 
 <!-- SECTION: SONNET TELEPORT -->
-<div class="section-label">
-  <h2>The Teleport II: Sonnet Edition</h2>
+<div class="section-label" id="teleport-ii">
+  <h2><a href="#teleport-ii">The Teleport II: Sonnet Edition<span class="anchor-hash">#</span></a></h2>
   <p>Claude Sonnet 4.5 does it too — across multiple independent runs</p>
 </div>
 
@@ -545,7 +667,7 @@
       <div class="model-icon icon-anthropic">A</div>
       <div class="model-info">
         <div class="model-name">Claude Sonnet 4.5</div>
-        <div class="model-detail">anthropic/claude-sonnet-4.5 &middot; reasoning prompt</div>
+        <div class="model-detail">anthropic/claude-sonnet-4.5 &middot; <span class="prompt-badge">reasoning prompt<span class="prompt-info">?<span class="prompt-tooltip"><strong>Reasoning prompt:</strong> Same question but with <code>Give a direct answer first, then a brief reason.</code> appended. This simple nudge more than doubles the overall pass rate (56.5% vs 24.0%), suggesting models <em>know</em> the answer but need help surfacing it.</span></span></span></div>
       </div>
       <span class="verdict verdict-recovery">Recovered</span>
     </div>
@@ -568,8 +690,8 @@
 </div>
 
 <!-- SECTION: YOUR CAR WILL STILL GET CLEAN -->
-<div class="section-label">
-  <h2>The Prophecy</h2>
+<div class="section-label" id="the-prophecy">
+  <h2><a href="#the-prophecy">The Prophecy<span class="anchor-hash">#</span></a></h2>
   <p>Grok 4 Fast confidently asserts your car will get clean whether you bring it or not</p>
 </div>
 
@@ -579,7 +701,7 @@
       <div class="model-icon icon-xai">X</div>
       <div class="model-info">
         <div class="model-name">Grok 4 Fast</div>
-        <div class="model-detail">x-ai/grok-4.1-fast &middot; simple prompt</div>
+        <div class="model-detail">x-ai/grok-4.1-fast &middot; <span class="prompt-badge">simple prompt<span class="prompt-info">?<span class="prompt-tooltip"><strong>Simple prompt:</strong> A short, natural question with no formatting instructions. e.g. <code>Should I walk or drive 100m to get my car washed?</code> Models get no hint to structure their answer.</span></span></span></div>
       </div>
       <span class="verdict verdict-recovery">Recovered</span>
     </div>
@@ -614,8 +736,8 @@
 </div>
 
 <!-- SECTION: DIRTY CAR SAFETY -->
-<div class="section-label">
-  <h2>The Safety Hazard</h2>
+<div class="section-label" id="safety-hazard">
+  <h2><a href="#safety-hazard">The Safety Hazard<span class="anchor-hash">#</span></a></h2>
   <p>ChatGPT 5.2 Thinking invents dirty car traffic regulations</p>
 </div>
 
@@ -625,7 +747,7 @@
       <div class="model-icon icon-openai">G</div>
       <div class="model-info">
         <div class="model-name">ChatGPT 5.2 Thinking</div>
-        <div class="model-detail">openai/gpt-5.2 &middot; reasoning prompt</div>
+        <div class="model-detail">openai/gpt-5.2 &middot; <span class="prompt-badge">reasoning prompt<span class="prompt-info">?<span class="prompt-tooltip"><strong>Reasoning prompt:</strong> Same question but with <code>Start with a direct answer, then one short reason.</code> appended. This simple nudge more than doubles the overall pass rate (56.5% vs 24.0%), suggesting models <em>know</em> the answer but need help surfacing it.</span></span></span></div>
       </div>
       <span class="verdict verdict-recovery">Recovered</span>
     </div>
@@ -646,8 +768,8 @@
 </div>
 
 <!-- SECTION: GROK NAILS IT -->
-<div class="section-label">
-  <h2>The One That Just Gets It</h2>
+<div class="section-label" id="just-gets-it">
+  <h2><a href="#just-gets-it">The One That Just Gets It<span class="anchor-hash">#</span></a></h2>
   <p>The most perfectly concise correct answer in the entire dataset</p>
 </div>
 
@@ -657,7 +779,7 @@
       <div class="model-icon icon-xai">X</div>
       <div class="model-info">
         <div class="model-name">Grok 4 Fast</div>
-        <div class="model-detail">x-ai/grok-4.1-fast &middot; reasoning prompt</div>
+        <div class="model-detail">x-ai/grok-4.1-fast &middot; <span class="prompt-badge">reasoning prompt<span class="prompt-info">?<span class="prompt-tooltip"><strong>Reasoning prompt:</strong> Same question but with <code>Direct answer first, short reason second.</code> appended. This simple nudge more than doubles the overall pass rate (56.5% vs 24.0%), suggesting models <em>know</em> the answer but need help surfacing it.</span></span></span></div>
       </div>
       <span class="verdict verdict-pass">Pass</span>
     </div>
@@ -674,8 +796,8 @@
 </div>
 
 <!-- SECTION: THE IMMOVABLE OBJECT (from earlier run) -->
-<div class="section-label">
-  <h2>The Immovable Object</h2>
+<div class="section-label" id="immovable-object">
+  <h2><a href="#immovable-object">The Immovable Object<span class="anchor-hash">#</span></a></h2>
   <p>Grok 4 Fast (from an earlier run) gets one wrong and absolutely refuses to back down</p>
 </div>
 
